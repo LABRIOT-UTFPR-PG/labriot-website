@@ -3,6 +3,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle" // 1. Importe o componente
 
 export default function SiteLayout({
   children,
@@ -61,6 +62,8 @@ export default function SiteLayout({
             </Link>
           </nav>
           <div className="flex items-center gap-4">
+            {/* 2. Adicione o botão aqui */}
+            <ThemeToggle />
             <Button asChild className="hidden md:flex">
               <Link href="/contact">
                 Colabore conosco <ArrowRight className="ml-2 h-4 w-4" />
@@ -271,4 +274,3 @@ export default function SiteLayout({
     </div>
   )
 }
-

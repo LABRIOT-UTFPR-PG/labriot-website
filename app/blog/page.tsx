@@ -1,11 +1,35 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
+interface Post {
+  id: number;
+  title: string;
+  author: string;
+  date: string;
+  content: string;
+}
+
 export default function BlogPage() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/posts')
+      .then(res => res.json())
+      .then(data => {
+        setPosts(data);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div>Carregando...</div>;
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
@@ -26,192 +50,26 @@ export default function BlogPage() {
                 </form>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl gap-8 py-12 lg:grid-cols-2">
-              <Card className="flex flex-col overflow-hidden">
-                <div className="aspect-video relative">
-                  <Image
-                    src="/placeholder.svg?height=300&width=600"
-                    alt="Avanço na Manipulação Robótica"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Avanço na Manipulação Robótica: Nova Tecnologia de Sensoriamento Tátil</CardTitle>
-                  <CardDescription>15 de Março de 2023 • Dra. Aisha Patel</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Nossa equipe desenvolveu uma nova tecnologia de sensoriamento tátil que permite aos robôs manipular
-                    objetos delicados com precisão e sensibilidade sem precedentes.
-                  </p>
-                </CardContent>
-                <CardFooter className="mt-auto">
-                  <Button asChild>
-                    <Link href="/blog/breakthrough-robotic-manipulation">
-                      Leia Mais <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-              <Card className="flex flex-col overflow-hidden">
-                <div className="aspect-video relative">
-                  <Image
-                    src="/placeholder.svg?height=300&width=600"
-                    alt="Labriot Recebe Subsídio"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Labriot Recebe Subsídio de R$ 12,5 Milhões para Pesquisa em Navegação Autônoma</CardTitle>
-                  <CardDescription>10 de Março de 2023 • Dra. Sarah Chen</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Nosso laboratório recebeu um subsídio significativo para avançar a pesquisa em sistemas de navegação
-                    autônoma para ambientes complexos.
-                  </p>
-                </CardContent>
-                <CardFooter className="mt-auto">
-                  <Button asChild>
-                    <Link href="/blog/grant-autonomous-navigation">
-                      Leia Mais <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-              <Card className="flex flex-col overflow-hidden">
-                <div className="aspect-video relative">
-                  <Image
-                    src="/placeholder.svg?height=300&width=600"
-                    alt="Publicação na Nature Robotics"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Novo Artigo Publicado na Nature Robotics</CardTitle>
-                  <CardDescription>28 de Fevereiro de 2023 • Dr. Marcus Johnson</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    A pesquisa inovadora da nossa equipe sobre sensoriamento tátil em manipulação robótica foi publicada
-                    na Nature Robotics.
-                  </p>
-                </CardContent>
-                <CardFooter className="mt-auto">
-                  <Button asChild>
-                    <Link href="/blog/nature-robotics-publication">
-                      Leia Mais <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-              <Card className="flex flex-col overflow-hidden">
-                <div className="aspect-video relative">
-                  <Image
-                    src="/placeholder.svg?height=300&width=600"
-                    alt="Workshop de Robótica"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Labriot Sediará Workshop Internacional de Robótica</CardTitle>
-                  <CardDescription>10 de Janeiro de 2023 • Dra. Elena Rodriguez</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Junte-se a nós para um workshop de três dias com pesquisadores líderes no campo da robótica e IA.
-                  </p>
-                </CardContent>
-                <CardFooter className="mt-auto">
-                  <Button asChild>
-                    <Link href="/blog/international-robotics-workshop">
-                      Leia Mais <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-              <Card className="flex flex-col overflow-hidden">
-                <div className="aspect-video relative">
-                  <Image
-                    src="/placeholder.svg?height=300&width=600"
-                    alt="Estrutura de Ética em IA"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Introduzindo uma Nova Estrutura para Desenvolvimento Ético de IA</CardTitle>
-                  <CardDescription>15 de Dezembro de 2022 • Dr. Thomas Lee</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Nossa equipe desenvolveu uma estrutura abrangente para garantir que considerações éticas sejam
-                    integradas aos processos de desenvolvimento de IA.
-                  </p>
-                </CardContent>
-                <CardFooter className="mt-auto">
-                  <Button asChild>
-                    <Link href="/blog/ethical-ai-framework">
-                      Leia Mais <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-              <Card className="flex flex-col overflow-hidden">
-                <div className="aspect-video relative">
-                  <Image
-                    src="/placeholder.svg?height=300&width=600"
-                    alt="Robótica de Enxame"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Avanços em Robótica de Enxame para Monitoramento Ambiental</CardTitle>
-                  <CardDescription>20 de Novembro de 2022 • Dra. Maya Nguyen</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Nossa equipe de pesquisa fez progressos significativos no desenvolvimento de sistemas de robótica de
-                    enxame para aplicações de monitoramento ambiental.
-                  </p>
-                </CardContent>
-                <CardFooter className="mt-auto">
-                  <Button asChild>
-                    <Link href="/blog/swarm-robotics-environmental-monitoring">
-                      Leia Mais <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-            <div className="flex justify-center">
-              <Button variant="outline" size="lg">
-                Carregar Mais Artigos
-              </Button>
-            </div>
-          </div>
-        </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Assine Nossa Newsletter</h2>
-              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed">
-                Mantenha-se atualizado com nossos mais recentes avanços de pesquisa, publicações e eventos.
-              </p>
-            </div>
-            <div className="mx-auto w-full max-w-sm space-y-2">
-              <form className="flex flex-col gap-2 sm:flex-row">
-                <Input type="email" placeholder="Digite seu email" className="max-w-lg flex-1" />
-                <Button type="submit">Assinar</Button>
-              </form>
-              <p className="text-xs text-muted-foreground">
-                Respeitamos sua privacidade. Cancele a inscrição a qualquer momento.
-              </p>
+            
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-12">
+              {posts.map(post => (
+                <Card key={post.id}>
+                  <CardHeader>
+                    <CardTitle>{post.title}</CardTitle>
+                    <CardDescription>{post.author} • {new Date(post.date).toLocaleDateString()}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground truncate">{post.content}</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button asChild>
+                      <Link href={`/blog/${post.id}`}>
+                        Leia Mais <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
@@ -219,4 +77,3 @@ export default function BlogPage() {
     </div>
   )
 }
-

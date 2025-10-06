@@ -3,9 +3,11 @@ import Image from "next/image"
 import { ArrowRight, Brain, ChevronRight, Cpu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import LatestNews from "@/components/latest-news"
 import ResearchHighlights from "@/components/research-highlights"
+import TeamMembers from "@/components/team-members"
+import Projects from "@/components/projects"
+import Research from "@/components/research"
 
 export default function Home() {
   return (
@@ -236,124 +238,9 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <Tabs defaultValue="ongoing" className="mt-8 w-full max-w-4xl mx-auto">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="ongoing">Projetos em Andamento</TabsTrigger>
-              <TabsTrigger value="completed">Projetos Concluídos</TabsTrigger>
-            </TabsList>
-            <TabsContent value="ongoing" className="mt-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>ATLAS: Sistema de Aprendizado e Adaptação de Terreno Autônomo</CardTitle>
-                    <CardDescription>Iniciado: Janeiro 2023</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                      <Image
-                        src="/placeholder.svg?height=225&width=400"
-                        alt="Robô ATLAS navegando em terreno acidentado"
-                        width={400}
-                        height={225}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Desenvolvendo um sistema robótico capaz de navegar e se adaptar autonomamente a terrenos
-                      desconhecidos e desafiadores usando técnicas de aprendizado por reforço.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button asChild>
-                      <Link href="/projects/atlas">Ver Detalhes do Projeto</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>NEXUS: Sistema de Compreensão Cruzada Aprimorado por Redes Neurais</CardTitle>
-                    <CardDescription>Iniciado: Março 2023</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                      <Image
-                        src="/placeholder.svg?height=225&width=400"
-                        alt="Visualização da rede neural NEXUS"
-                        width={400}
-                        height={225}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Criando um sistema de IA multimodal que pode entender e traduzir entre diferentes formas de dados,
-                      incluindo texto, imagens e leituras de sensores.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button asChild>
-                      <Link href="/projects/nexus">Ver Detalhes do Projeto</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
-            </TabsContent>
-            <TabsContent value="completed" className="mt-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>HERMES: Manipulação Robótica que Emula Humanos com Sensibilidade Aprimorada</CardTitle>
-                    <CardDescription>Concluído: Novembro 2022</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                      <Image
-                        src="/placeholder.svg?height=225&width=400"
-                        alt="Mão robótica HERMES manipulando objetos delicados"
-                        width={400}
-                        height={225}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Desenvolveu uma mão robótica com sensores táteis capaz de manipular objetos delicados com destreza
-                      e sensibilidade semelhantes às humanas.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button asChild>
-                      <Link href="/projects/hermes">Ver Detalhes do Projeto</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>IRIS: Sistema Inteligente de Reconhecimento e Interpretação</CardTitle>
-                    <CardDescription>Concluído: Agosto 2022</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                      <Image
-                        src="/placeholder.svg?height=225&width=400"
-                        alt="Sistema de visão computacional IRIS em ação"
-                        width={400}
-                        height={225}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Criou um sistema avançado de visão computacional capaz de reconhecer e interpretar cenas complexas
-                      e atividades humanas em tempo real.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button asChild>
-                      <Link href="/projects/iris">Ver Detalhes do Projeto</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="mt-8 w-full max-w-4xl mx-auto">
+            <Projects />
+          </div>
           <div className="flex justify-center mt-12">
             <Button asChild size="lg">
               <Link href="/projects">
@@ -373,61 +260,8 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl gap-8 py-12 md:grid-cols-2 lg:grid-cols-3">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative h-40 w-40 overflow-hidden rounded-full">
-                <Image
-                  src="/placeholder.svg?height=160&width=160"
-                  alt="Dra. Sarah Chen"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-xl font-bold">Dra. Sarah Chen</h3>
-                <p className="text-sm text-muted-foreground">Diretora do Laboratório</p>
-                <p className="text-sm">Robótica, Visão Computacional, Ética em IA</p>
-              </div>
-              <Button variant="outline" asChild size="sm">
-                <Link href="/team/sarah-chen">Ver Perfil</Link>
-              </Button>
-            </div>
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative h-40 w-40 overflow-hidden rounded-full">
-                <Image
-                  src="/placeholder.svg?height=160&width=160"
-                  alt="Dr. Marcus Johnson"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-xl font-bold">Dr. Marcus Johnson</h3>
-                <p className="text-sm text-muted-foreground">Pesquisador Líder</p>
-                <p className="text-sm">Aprendizado de Máquina, Redes Neurais</p>
-              </div>
-              <Button variant="outline" asChild size="sm">
-                <Link href="/team/marcus-johnson">Ver Perfil</Link>
-              </Button>
-            </div>
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative h-40 w-40 overflow-hidden rounded-full">
-                <Image
-                  src="/placeholder.svg?height=160&width=160"
-                  alt="Dra. Aisha Patel"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-xl font-bold">Dra. Aisha Patel</h3>
-                <p className="text-sm text-muted-foreground">Pesquisadora Sênior</p>
-                <p className="text-sm">Manipulação Robótica, Fusão de Sensores</p>
-              </div>
-              <Button variant="outline" asChild size="sm">
-                <Link href="/team/aisha-patel">Ver Perfil</Link>
-              </Button>
-            </div>
+          <div className="mx-auto grid max-w-5xl gap-8 py-12">
+            <TeamMembers />
           </div>
           <div className="flex justify-center">
             <Button asChild>
@@ -464,8 +298,6 @@ export default function Home() {
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Destaques de Pesquisa</h2>
                 <p className="text-muted-foreground md:text-xl/relaxed">
-                  Nosso trabalho foi publicado em revistas e conferências de alto nível, contribuindo para o avanço da
-                  robótica e IA.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -497,4 +329,3 @@ export default function Home() {
     </>
   )
 }
-

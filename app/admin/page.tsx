@@ -6,27 +6,20 @@ import { Button } from "@/components/ui/button"
 export default function AdminDashboard() {
   // Dados simulados para o dashboard
   const stats = [
-    { title: "Pesquisas", value: "8", icon: FileText, link: "/admin/research" },
-    { title: "Projetos", value: "12", icon: Folder, link: "/admin/projects" },
-    { title: "Membros da Equipe", value: "15", icon: Users, link: "/admin/team" },
-    { title: "Publicações", value: "24", icon: BookOpen, link: "/admin/publications" },
-    { title: "Posts do Blog", value: "32", icon: FileText, link: "/admin/blog" },
-    { title: "Eventos", value: "5", icon: Calendar, link: "/admin/events" },
+    { title: "Pesquisas", value: '', icon: FileText, link: "/admin/research" },
+    { title: "Projetos", value: "", icon: Folder, link: "/admin/projects" },
+    { title: "Membros da Equipe", value: "", icon: Users, link: "/admin/team" },
+    { title: "Publicações", value: "", icon: BookOpen, link: "/admin/publications" },
+    { title: "Posts do Blog", value: "", icon: FileText, link: "/admin/blog" },
+    { title: "Eventos", value: "", icon: Calendar, link: "/admin/events" },
   ]
 
   const recentActivity = [
     {
-      action: "Projeto atualizado",
-      item: "ATLAS: Sistema de Aprendizado e Adaptação de Terreno Autônomo",
-      time: "Há 2 horas",
+      action: "",
+      item: "",
+      time: "",
     },
-    { action: "Novo membro adicionado", item: "Dr. Ricardo Santos", time: "Há 1 dia" },
-    {
-      action: "Post do blog publicado",
-      item: "Avanços em Robótica de Enxame para Monitoramento Ambiental",
-      time: "Há 3 dias",
-    },
-    { action: "Publicação adicionada", item: "Aprendizado Adaptativo em Sistemas Robóticos", time: "Há 5 dias" },
   ]
 
   return (

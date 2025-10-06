@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import LatestNews from "@/components/latest-news"
 import ResearchHighlights from "@/components/research-highlights"
+import TeamMembers from "@/components/team-members"
 
 export default function Home() {
   return (
@@ -373,61 +374,8 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl gap-8 py-12 md:grid-cols-2 lg:grid-cols-3">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative h-40 w-40 overflow-hidden rounded-full">
-                <Image
-                  src="/placeholder.svg?height=160&width=160"
-                  alt="Dra. Sarah Chen"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-xl font-bold">Dra. Sarah Chen</h3>
-                <p className="text-sm text-muted-foreground">Diretora do Laboratório</p>
-                <p className="text-sm">Robótica, Visão Computacional, Ética em IA</p>
-              </div>
-              <Button variant="outline" asChild size="sm">
-                <Link href="/team/sarah-chen">Ver Perfil</Link>
-              </Button>
-            </div>
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative h-40 w-40 overflow-hidden rounded-full">
-                <Image
-                  src="/placeholder.svg?height=160&width=160"
-                  alt="Dr. Marcus Johnson"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-xl font-bold">Dr. Marcus Johnson</h3>
-                <p className="text-sm text-muted-foreground">Pesquisador Líder</p>
-                <p className="text-sm">Aprendizado de Máquina, Redes Neurais</p>
-              </div>
-              <Button variant="outline" asChild size="sm">
-                <Link href="/team/marcus-johnson">Ver Perfil</Link>
-              </Button>
-            </div>
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative h-40 w-40 overflow-hidden rounded-full">
-                <Image
-                  src="/placeholder.svg?height=160&width=160"
-                  alt="Dra. Aisha Patel"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-xl font-bold">Dra. Aisha Patel</h3>
-                <p className="text-sm text-muted-foreground">Pesquisadora Sênior</p>
-                <p className="text-sm">Manipulação Robótica, Fusão de Sensores</p>
-              </div>
-              <Button variant="outline" asChild size="sm">
-                <Link href="/team/aisha-patel">Ver Perfil</Link>
-              </Button>
-            </div>
+          <div className="mx-auto grid max-w-5xl gap-8 py-12">
+            <TeamMembers />
           </div>
           <div className="flex justify-center">
             <Button asChild>
@@ -497,4 +445,3 @@ export default function Home() {
     </>
   )
 }
-

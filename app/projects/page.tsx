@@ -1,10 +1,30 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useEffect, useState } from "react"
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<any[]>([])
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then(res => res.json())
+      .then(data => {
+        setProjects(data)
+        setLoading(false)
+      })
+  }, [])
+
+  const ongoingProjects = projects.filter(p => p.status === 'ongoing');
+  const completedProjects = projects.filter(p => p.status === 'completed');
+
+  if (loading) return <div>Carregando...</div>
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
@@ -25,218 +45,64 @@ export default function ProjectsPage() {
               </TabsList>
               <TabsContent value="ongoing" className="mt-6">
                 <div className="grid gap-6 md:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>ATLAS: Sistema de Aprendizado e Adaptação de Terreno Autônomo</CardTitle>
-                      <CardDescription>Iniciado: Janeiro 2023</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Robô ATLAS navegando em terreno acidentado"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Desenvolvendo um sistema robótico capaz de navegar e se adaptar autonomamente a terrenos
-                        desconhecidos e desafiadores usando técnicas de aprendizado por reforço.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/atlas">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>NEXUS: Sistema de Compreensão Cruzada Aprimorado por Redes Neurais</CardTitle>
-                      <CardDescription>Iniciado: Março 2023</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Visualização da rede neural NEXUS"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Criando um sistema de IA multimodal que pode entender e traduzir entre diferentes formas de
-                        dados, incluindo texto, imagens e leituras de sensores.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/nexus">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>SENTINEL: Monitoramento Ambiental Inteligente com Inteligência de Enxame</CardTitle>
-                      <CardDescription>Iniciado: Abril 2023</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Robôs de enxame SENTINEL monitorando o ambiente"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Desenvolvendo um enxame de pequenos robôs autônomos que trabalham juntos para monitorar
-                        condições ambientais e coletar dados em locais de difícil acesso ou perigosos.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/sentinel">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>ARIA: Interface Robótica Adaptativa para Assistência</CardTitle>
-                      <CardDescription>Iniciado: Junho 2023</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Robô assistivo ARIA interagindo com uma pessoa"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Criando um sistema robótico assistivo que pode se adaptar às necessidades e preferências
-                        individuais do usuário, fornecendo suporte personalizado para atividades diárias.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/aria">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                  {ongoingProjects.map(project => (
+                    <Card key={project.id}>
+                      <CardHeader>
+                        <CardTitle>{project.title}</CardTitle>
+                        <CardDescription>Iniciado: {project.startDate}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="mb-4 aspect-video overflow-hidden rounded-lg">
+                          <Image
+                            src={project.image || "/placeholder.svg"}
+                            alt={project.title}
+                            width={400}
+                            height={225}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {project.description}
+                        </p>
+                      </CardContent>
+                      <CardFooter>
+                        <Button asChild>
+                          <Link href={`/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
                 </div>
-              </TabsContent>
+            </TabsContent>
               <TabsContent value="completed" className="mt-6">
                 <div className="grid gap-6 md:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>HERMES: Manipulação Robótica que Emula Humanos com Sensibilidade Aprimorada</CardTitle>
-                      <CardDescription>Concluído: Novembro 2022</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Mão robótica HERMES manipulando objetos delicados"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Desenvolveu uma mão robótica com sensores táteis capaz de manipular objetos delicados com
-                        destreza e sensibilidade semelhantes às humanas.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/hermes">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>IRIS: Sistema Inteligente de Reconhecimento e Interpretação</CardTitle>
-                      <CardDescription>Concluído: Agosto 2022</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Sistema de visão computacional IRIS em ação"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Criou um sistema avançado de visão computacional capaz de reconhecer e interpretar cenas
-                        complexas e atividades humanas em tempo real.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/iris">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>ECHO: Comunicação Aprimorada para Operações Humano-Robô</CardTitle>
-                      <CardDescription>Concluído: Maio 2022</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Demonstração do sistema de comunicação ECHO"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Desenvolveu uma interface de linguagem natural que permite comunicação intuitiva entre humanos e
-                        robôs em ambientes de trabalho colaborativo.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/echo">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>PULSE: Compreensão Preditiva de Sistemas de Aprendizado em Ambientes</CardTitle>
-                      <CardDescription>Concluído: Fevereiro 2022</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-                        <Image
-                          src="/placeholder.svg?height=225&width=400"
-                          alt="Visualização do sistema PULSE"
-                          width={400}
-                          height={225}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Criou uma estrutura para prever e compreender como sistemas de IA aprendem e se adaptam a novos
-                        ambientes, melhorando a transparência e explicabilidade.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild>
-                        <Link href="/projects/pulse">Ver Detalhes do Projeto</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                  {completedProjects.map(project => (
+                    <Card key={project.id}>
+                      <CardHeader>
+                        <CardTitle>{project.title}</CardTitle>
+                        <CardDescription>Concluído: {project.endDate}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="mb-4 aspect-video overflow-hidden rounded-lg">
+                          <Image
+                            src={project.image || "/placeholder.svg"}
+                            alt={project.title}
+                            width={400}
+                            height={225}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {project.description}
+                        </p>
+                      </CardContent>
+                      <CardFooter>
+                        <Button asChild>
+                          <Link href={`/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
                 </div>
               </TabsContent>
             </Tabs>
@@ -408,4 +274,3 @@ export default function ProjectsPage() {
     </div>
   )
 }
-

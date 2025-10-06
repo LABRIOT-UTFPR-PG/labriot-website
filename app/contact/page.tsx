@@ -1,3 +1,4 @@
+// app/contact/page.tsx
 "use client"
 
 import { useState } from "react"
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "@/components/ui/use-toast"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -22,35 +23,56 @@ export default function ContactPage() {
     interest: "",
   })
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectChange = (name, value) => {
+  const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleRadioChange = (value) => {
+  const handleRadioChange = (value: string) => {
     setFormData((prev) => ({ ...prev, interest: value }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log("Formulário enviado:", formData)
-    toast({
-      title: "Formulário Enviado",
-      description: "Obrigado por entrar em contato. Retornaremos em breve.",
-    })
-    // Resetar formulário
-    setFormData({
-      name: "",
-      email: "",
-      organization: "",
-      inquiryType: "",
-      message: "",
-      interest: "",
-    })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Formulário Enviado",
+          description: "Obrigado por entrar em contato. Retornaremos em breve.",
+        });
+        // Resetar formulário
+        setFormData({
+          name: "",
+          email: "",
+          organization: "",
+          inquiryType: "",
+          message: "",
+          interest: "",
+        });
+      } else {
+        throw new Error('Falha ao enviar o formulário.');
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao enviar o formulário. Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -93,7 +115,7 @@ export default function ContactPage() {
                         <h3 className="font-medium">Email</h3>
                         <p className="text-sm text-muted-foreground">
                           <Link href="mailto:info@labriot.com" className="hover:underline">
-                            info@labriot.com
+                            labriot.utfpr@gmail.com
                           </Link>
                         </p>
                       </div>
@@ -301,4 +323,3 @@ export default function ContactPage() {
     </div>
   )
 }
-
