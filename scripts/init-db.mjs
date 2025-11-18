@@ -56,6 +56,15 @@ async function initDb() {
       date TEXT,
       image TEXT
     );
+    CREATE TABLE IF NOT EXISTS events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      description TEXT,
+      date TEXT NOT NULL,
+      time TEXT,
+      location TEXT,
+      status TEXT DEFAULT 'Próximo'
+    );
   `);
 
   const salt = await bcrypt.genSalt(10);
