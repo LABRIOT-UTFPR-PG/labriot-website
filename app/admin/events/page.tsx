@@ -7,27 +7,7 @@ import { Plus, Search, Edit, Trash2, Calendar, MapPin } from "lucide-react"
 
 export default function EventsAdmin() {
   // Dados simulados de eventos
-  const events = [
-    {
-      id: 1,
-      title: "Workshop Internacional de Robótica",
-      date: "15-17 de Junho, 2023",
-      location: "São Paulo, Brasil",
-      type: "Workshop",
-      status: "Próximo",
-      description:
-        "Um workshop de três dias com pesquisadores líderes no campo da robótica e IA, apresentando as últimas inovações e tendências.",
-    },
-    {
-      id: 2,
-      title: "Seminário sobre Ética em IA",
-      date: "20 de Outubro, 2025",
-      location: "Online",
-      type: "Seminário",
-      status: "Próximo",
-      description: "Discussão sobre as implicações éticas do avanço da Inteligência Artificial.",
-    }
-  ]
+  const events = []
 
   return (
     <div className="space-y-6">

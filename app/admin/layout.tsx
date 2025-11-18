@@ -76,12 +76,13 @@ useEffect(() => {
               <div className="px-2 py-2">
                 <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Conteúdo</h2>
                 <div className="space-y-1">
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  {/* <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/research">
                       <FileText className="mr-2 h-4 w-4" />
                       Pesquisas
                     </Link>
-                  </Button>
+                  </Button>*/}
+                  
                   <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/projects">
                       <Folder className="mr-2 h-4 w-4" />
@@ -106,12 +107,12 @@ useEffect(() => {
                       Blog
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
+                  {<Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/events">
                       <Calendar className="mr-2 h-4 w-4" />
                       Eventos
                     </Link>
-                  </Button>
+                  </Button>}
                 </div>
               </div>
               <div className="px-2 py-2">

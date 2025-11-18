@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button"
 export default function AdminDashboard() {
   // Dados simulados para o dashboard
   const stats = [
-    { title: "Pesquisas", value: '', icon: FileText, link: "/admin/research" },
+    //{ title: "Pesquisas", value: '', icon: FileText, link: "/admin/research" },
     { title: "Projetos", value: "", icon: Folder, link: "/admin/projects" },
     { title: "Membros da Equipe", value: "", icon: Users, link: "/admin/team" },
     { title: "Publicações", value: "", icon: BookOpen, link: "/admin/publications" },
     { title: "Posts do Blog", value: "", icon: FileText, link: "/admin/blog" },
-    { title: "Eventos", value: "", icon: Calendar, link: "/admin/events" },
+    //{ title: "Eventos", value: "", icon: Calendar, link: "/admin/events" },
   ]
 
   const recentActivity = [
@@ -39,7 +39,7 @@ export default function AdminDashboard() {
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+                {/*<Icon className="h-4 w-4 text-muted-foreground" />*/}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
@@ -104,12 +104,12 @@ export default function AdminDashboard() {
                   Adicionar Membro da Equipe
                 </Link>
               </Button>
-              <Button className="w-full justify-start" asChild>
+              {<Button className="w-full justify-start" asChild>
                 <Link href="/admin/events/new">
                   <Calendar className="mr-2 h-4 w-4" />
                   Agendar Evento
                 </Link>
-              </Button>
+              </Button>}
             </div>
           </CardContent>
         </Card>
