@@ -3,8 +3,7 @@ import { cookies } from 'next/headers';
 
 // Uma função de logout para ser usada por ambos os métodos GET e POST
 async function performLogout() {
-  const cookieStore = cookies();
-  // Define o cookie com uma data de expiração no passado para removê-lo
+  const cookieStore = await cookies(); // Adicione 'await' aqui também
   cookieStore.set('token', '', { httpOnly: true, path: '/', maxAge: 0 });
   return NextResponse.json({ message: 'Logout bem-sucedido' });
 }

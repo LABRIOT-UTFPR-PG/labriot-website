@@ -27,8 +27,9 @@ export async function POST(request: Request) {
       expiresIn: '1h',
     });
 
-    // Correção: Adicionado 'await' aqui
-    const cookieStore = cookies();
+    // CORREÇÃO: Adicione o 'await' antes de cookies()
+    const cookieStore = await cookies(); 
+    
     cookieStore.set('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== 'development',

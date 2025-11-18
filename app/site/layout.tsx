@@ -30,12 +30,14 @@ export default function SiteLayout({
             <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
               Início
             </Link>
+            {/*
             <Link
               href="/research"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
             >
               Pesquisa
             </Link>
+            */}
             <Link
               href="/projects"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
@@ -151,11 +153,11 @@ export default function SiteLayout({
                       Blog
                     </Link>
                   </li>
-                  <li>
-                    <Link href="/events" className="text-muted-foreground transition-colors hover:text-foreground">
+                  
+                    {/*<Link href="/events" className="text-muted-foreground transition-colors hover:text-foreground">
                       Eventos
-                    </Link>
-                  </li>
+                    </Link>*/}
+                  
                   <li>
                     <Link href="/newsletter" className="text-muted-foreground transition-colors hover:text-foreground">
                       Newsletter
