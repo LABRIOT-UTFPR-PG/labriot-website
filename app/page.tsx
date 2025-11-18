@@ -8,6 +8,7 @@ import ResearchHighlights from "@/components/research-highlights"
 import TeamMembers from "@/components/team-members"
 import Projects from "@/components/projects"
 import Research from "@/components/research"
+import UpcomingEvents from "@/components/upcoming-events"
 
 export default function Home() {
   return (
@@ -272,21 +273,28 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+      {/* Nova Seção de Eventos */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/50">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-10 md:grid-cols-2">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Últimas Notícias e Insights</h2>
-              <p className="mt-4 text-muted-foreground md:text-xl/relaxed">
-                Mantenha-se atualizado com nossos mais recentes avanços de pesquisa, publicações e eventos.
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Próximos Eventos</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
+                Participe de nossos workshops, seminários e conferências sobre Robótica e IA.
               </p>
-              <Button asChild className="mt-6">
-                <Link href="/blog">
-                  Visite Nosso Blog <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </div>
-            <LatestNews />
+          </div>
+          
+          <div className="mx-auto max-w-6xl">
+            <UpcomingEvents />
+          </div>
+
+          <div className="flex justify-center mt-10">
+            <Button asChild variant="outline" size="lg">
+              <Link href="/events">
+                Ver Calendário Completo <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
