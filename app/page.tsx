@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import LatestNews from "@/components/latest-news"
 import ResearchHighlights from "@/components/research-highlights"
 import TeamMembers from "@/components/team-members"
+import Projects from "@/components/projects" // Importação adicionada
 
 export default function Home() {
   return (
@@ -126,8 +127,8 @@ export default function Home() {
       {/*<section className="w-full py-12 md:py-24 lg:py-32">
         ... (Esta seção estava comentada e não será modificada)
       </section>*/}
-      {/* Seção 3: Preto (Projetos em Destaque) */}
-<section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+      {/* Seção 3: Projetos em Destaque - Agora usando o componente dinâmico Projects */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
@@ -138,7 +139,8 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-8 w-full max-w-4xl mx-auto">
-            <projects />
+            {/* Componente Projects para carregar projetos do banco de dados com abas */}
+            <Projects />
           </div>
           <div className="flex justify-center mt-12">
             <Button asChild size="lg">
