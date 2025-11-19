@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 async function initDb() {
   const db = await openDb();
   
-  // Corrigido: Removido o caractere de escape antes do template literal
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +17,8 @@ async function initDb() {
       role TEXT NOT NULL,
       specialization TEXT,
       category TEXT NOT NULL CHECK(category IN ('leadership', 'students')),
-      image TEXT
+      image TEXT,
+      linkedin TEXT
     );
 
     CREATE TABLE IF NOT EXISTS projects (

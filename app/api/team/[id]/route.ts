@@ -13,14 +13,18 @@ export async function GET(request: Request, context: { params: { id: string } })
 export async function PUT(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
   const data = await request.json();
-  const { name, role, specialization, category, image } = data;
+  // Adicionado linkedin na extração
+  const { name, specialization, image, linkedin } = data;
+
+  const role = "Pesquisador";
+  const category = "students";
 
   await db.run(
-    'UPDATE team SET name = ?, role = ?, specialization = ?, category = ?, image = ? WHERE id = ?',
-    [name, role, specialization, category, image, context.params.id]
+    'UPDATE team SET name = ?, role = ?, specialization = ?, category = ?, image = ?, linkedin = ? WHERE id = ?',
+    [name, role, specialization, category, image, linkedin, context.params.id]
   );
 
-  return NextResponse.json({ id: context.params.id, ...data });
+  return NextResponse.json({ id: context.params.id, ...data, role, category });
 }
 
 export async function DELETE(request: Request, context: { params: { id: string } }) {

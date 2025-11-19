@@ -10,12 +10,16 @@ export async function GET() {
 export async function POST(request: Request) {
   const db = await openDb();
   const data = await request.json();
-  const { name, role, specialization, category, image } = data;
+  // Adicionado linkedin na extração
+  const { name, specialization, image, linkedin } = data;
+  
+  const role = "Pesquisador";
+  const category = "students";
 
   const result = await db.run(
-    'INSERT INTO team (name, role, specialization, category, image) VALUES (?, ?, ?, ?, ?)',
-    [name, role, specialization, category, image]
+    'INSERT INTO team (name, role, specialization, category, image, linkedin) VALUES (?, ?, ?, ?, ?, ?)',
+    [name, role, specialization, category, image, linkedin]
   );
 
-  return NextResponse.json({ id: result.lastID, ...data });
+  return NextResponse.json({ id: result.lastID, ...data, role, category });
 }

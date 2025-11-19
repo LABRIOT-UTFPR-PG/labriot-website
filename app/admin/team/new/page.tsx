@@ -5,15 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function NewTeamMember() {
   const [name, setName] = useState('');
-  const [role, setRole] = useState('');
   const [specialization, setSpecialization] = useState('');
-  const [category, setCategory] = useState('');
   const [image, setImage] = useState('');
+  const [linkedin, setLinkedin] = useState(''); // Novo estado
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +19,7 @@ export default function NewTeamMember() {
     await fetch('/api/team', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, role, specialization, category, image }),
+      body: JSON.stringify({ name, specialization, image, linkedin }), // Enviando linkedin
     });
     router.push('/admin/team');
   };
@@ -39,24 +37,17 @@ export default function NewTeamMember() {
                         <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
                     </div>
                     <div>
-                        <Label htmlFor="role">Cargo</Label>
-                        <Input id="role" value={role} onChange={(e) => setRole(e.target.value)} required />
-                    </div>
-                    <div>
                         <Label htmlFor="specialization">Especialização</Label>
                         <Input id="specialization" value={specialization} onChange={(e) => setSpecialization(e.target.value)} />
                     </div>
                     <div>
-                        <Label htmlFor="category">Categoria</Label>
-                        <Select onValueChange={setCategory} required>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Selecione a categoria" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="leadership">Liderança</SelectItem>
-                            <SelectItem value="students">Estudantes</SelectItem>
-                        </SelectContent>
-                        </Select>
+                        <Label htmlFor="linkedin">LinkedIn (URL)</Label>
+                        <Input 
+                          id="linkedin" 
+                          value={linkedin} 
+                          onChange={(e) => setLinkedin(e.target.value)} 
+                          placeholder="https://www.linkedin.com/in/seu-perfil" 
+                        />
                     </div>
                     <div>
                         <Label htmlFor="image">URL da Imagem</Label>

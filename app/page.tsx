@@ -26,12 +26,12 @@ export default function Home() {
                   inteligência artificial através de pesquisa e desenvolvimento inovadores.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Button asChild size="lg">
+              {/*<Button asChild size="lg">
                   <Link href="/research">
                     Explore Nossa Pesquisa <ChevronRight className="ml-2 h-4 w-4" />
                   </Link>
-                </Button>
+                </Button> */}<div className="flex flex-col gap-2 min-[400px]:flex-row">
+                
                 <Button asChild variant="outline" size="lg">
                   <Link href="/contact">Contate-nos</Link>
                 </Button>

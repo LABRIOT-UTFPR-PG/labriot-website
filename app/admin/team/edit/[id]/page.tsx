@@ -5,41 +5,57 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function EditTeamMember({ params }: { params: { id: string } }) {
+export default function EditTeamMember({ params }: { params: Promise<{ id: string }> }) {
+  const [id, setId] = useState<string | null>(null);
   const [name, setName] = useState('');
-  const [role, setRole] = useState('');
   const [specialization, setSpecialization] = useState('');
-  const [category, setCategory] = useState('');
   const [image, setImage] = useState('');
+  const [linkedin, setLinkedin] = useState(''); // Novo estado
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { id } = params;
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setId(resolvedParams.id);
+    });
+  }, [params]);
 
   useEffect(() => {
     if (id) {
       fetch(`/api/team/${id}`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Falha ao buscar");
+            return res.json();
+        })
         .then(data => {
-          setName(data.name);
-          setRole(data.role);
-          setSpecialization(data.specialization);
-          setCategory(data.category);
-          setImage(data.image);
+          setName(data.name || '');
+          setSpecialization(data.specialization || '');
+          setImage(data.image || '');
+          setLinkedin(data.linkedin || ''); // Carrega linkedin
+          setLoading(false);
+        })
+        .catch(err => {
+            console.error(err);
+            setLoading(false);
         });
     }
   }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!id) return;
+
     await fetch(`/api/team/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, role, specialization, category, image }),
+      body: JSON.stringify({ name, specialization, image, linkedin }), // Salva linkedin
     });
     router.push('/admin/team');
   };
+
+  if (!id || loading) return <div className="p-8 text-center">Carregando dados do membro...</div>;
 
   return (
     <div className="space-y-6">
@@ -54,24 +70,17 @@ export default function EditTeamMember({ params }: { params: { id: string } }) {
                         <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
                     </div>
                     <div>
-                        <Label htmlFor="role">Cargo</Label>
-                        <Input id="role" value={role} onChange={(e) => setRole(e.target.value)} required />
-                    </div>
-                    <div>
                         <Label htmlFor="specialization">Especialização</Label>
                         <Input id="specialization" value={specialization} onChange={(e) => setSpecialization(e.target.value)} />
                     </div>
                     <div>
-                        <Label htmlFor="category">Categoria</Label>
-                        <Select value={category} onValueChange={setCategory} required>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Selecione a categoria" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="leadership">Liderança</SelectItem>
-                            <SelectItem value="students">Estudantes</SelectItem>
-                        </SelectContent>
-                        </Select>
+                        <Label htmlFor="linkedin">LinkedIn (URL)</Label>
+                        <Input 
+                          id="linkedin" 
+                          value={linkedin} 
+                          onChange={(e) => setLinkedin(e.target.value)} 
+                          placeholder="https://www.linkedin.com/in/seu-perfil" 
+                        />
                     </div>
                     <div>
                         <Label htmlFor="image">URL da Imagem</Label>
