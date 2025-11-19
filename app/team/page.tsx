@@ -12,7 +12,7 @@ export default function TeamPage() {
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Nossa Equipe</h1>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                  Conheça as mentes brilhantes por trás das pesquisas e inovações revolucionárias do Labriot.
+                  Conheça as mentes por trás das pesquisas e inovações do Labriot.
                 </p>
               </div>
             </div>

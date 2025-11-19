@@ -4,10 +4,10 @@ import { ArrowRight, Brain, ChevronRight, Cpu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import LatestNews from "@/components/latest-news"
+import UpcomingEvents from "@/components/upcoming-events"
 import ResearchHighlights from "@/components/research-highlights"
 import TeamMembers from "@/components/team-members"
-import Projects from "@/components/projects" // Importação adicionada
+import Projects from "@/components/projects"
 
 export default function Home() {
   return (
@@ -19,19 +19,14 @@ export default function Home() {
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                  Pioneiros no Futuro da Robótica e IA
+                  Avançando no Futuro da Robótica e IA
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  Labriot é um laboratório de pesquisa de ponta dedicado a avançar as fronteiras da robótica e
+                  Labriot é um laboratório de pesquisa dedicado a avançar as fronteiras da robótica e
                   inteligência artificial através de pesquisa e desenvolvimento inovadores.
                 </p>
               </div>
-              {/*<Button asChild size="lg">
-                  <Link href="/research">
-                    Explore Nossa Pesquisa <ChevronRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button> */}<div className="flex flex-col gap-2 min-[400px]:flex-row">
-                
+              <div className="flex flex-col gap-2 min-[400px]:flex-row">
                 <Button asChild variant="outline" size="lg">
                   <Link href="/contact">Contate-nos</Link>
                 </Button>
@@ -47,6 +42,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
       {/* Seção 2: Cinza */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-black-1000">
         <div className="container px-4 md:px-6">
@@ -88,58 +84,52 @@ export default function Home() {
                     <path d="M9 13v2" />
                   </svg>
                 </div>
-                <CardTitle>Sistemas Autônomos</CardTitle>
+                <CardTitle>Robótica</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Desenvolvendo sistemas robóticos autônomos capazes de navegar em ambientes complexos e tomar decisões
-                  sem intervenção humana.
+                  Desenvolvimento de sistemas robóticos inteligentes e soluções de IoT para resolver problemas complexos com alta precisão. 
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <Brain className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>Aprendizado de Máquina</CardTitle>
+                <CardTitle>Inteligência Artifical</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Criando algoritmos avançados que permitem às máquinas aprender com dados, adaptar-se a novas entradas
-                  e realizar tarefas semelhantes às humanas.
+                  Implementação de algoritmos de inteligência artificial e modelos de aprendizado de máquina para otimizar a tomada de decisão com assertividade estratégica.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <Cpu className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>Interação Humano-Robô</CardTitle>
+                <CardTitle>Agentes Inteligentes</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Pesquisando interfaces intuitivas e métodos de comunicação para aprimorar a colaboração entre humanos
-                  e sistemas robóticos.
+                  Criação de agentes inteligentes e desenvolvimento de LLMs para automatizar tarefas com alta adaptabilidade.
                 </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
-      {/*<section className="w-full py-12 md:py-24 lg:py-32">
-        ... (Esta seção estava comentada e não será modificada)
-      </section>*/}
-      {/* Seção 3: Projetos em Destaque - Agora usando o componente dinâmico Projects */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+
+      {/* Seção 3: Projetos em Destaque */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-black">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Projetos em Destaque</h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                Explore nossas iniciativas de pesquisa inovadoras e inovações tecnológicas.
+                Explore nossas iniciativas de pesquisa e inovações tecnológicas.
               </p>
             </div>
           </div>
           <div className="mt-8 w-full max-w-4xl mx-auto">
-            {/* Componente Projects para carregar projetos do banco de dados com abas */}
             <Projects />
           </div>
           <div className="flex justify-center mt-12">
@@ -151,14 +141,15 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* Seção 4: Cinza (Conheça Nossa Equipe) */}
+
+      {/* Seção 4: Conheça Nossa Equipe */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-black-1000">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Conheça Nossa Equipe</h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                Nossa diversificada equipe de pesquisadores e engenheiros reúne expertise de várias disciplinas.
+                Nossa equipe de desenvolvedores reúne expertise de várias disciplinas.
               </p>
             </div>
           </div>
@@ -174,29 +165,31 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* Seção 5: Preto (Últimas Notícias e Insights) */}
+
+      {/* Seção 5: Eventos (Substituindo Notícias) */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-black">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-10 md:grid-cols-2">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Últimas Notícias e Insights</h2>
-              <p className="mt-4 text-muted-foreground md:text-xl/relaxed">
-                Mantenha-se atualizado com nossos mais recentes avanços de pesquisa, publicações e eventos.
-              </p>
-              <Button asChild className="mt-6">
-                <Link href="/blog">
-                  Visite Nosso Blog <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <LatestNews />
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">
+             <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Agenda do Labriot</h2>
+             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
+               Estes são os próximos eventos, conferências e workshops que o Labriot irá participar e apresentar suas pesquisas.
+             </p>
+          </div>
+          
+          {/* Componente de Eventos */}
+          <UpcomingEvents />
+
+          <div className="flex justify-center mt-10">
+            <Button asChild className="mt-6">
+              <Link href="/events">
+                Ver Todos os Eventos <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
-      {/*<section className="w-full py-12 md:py-24 lg:py-32">
-        ... (Esta seção estava comentada e não será modificada)
-      </section>*/}
-      {/* Seção 6: Cinza (Colabore com o Labriot) */}
+
+      {/* Seção 6: Colabore com o Labriot */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-black-1000">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
           <div className="space-y-3">
