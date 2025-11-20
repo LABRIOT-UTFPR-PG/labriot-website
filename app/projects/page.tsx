@@ -140,46 +140,8 @@ export default function ProjectsPage() {
                     </div>
                     <span>Identificação e Definição do Problema</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="rounded-full bg-primary/10 p-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-primary"
-                      >
-                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                        <path d="m9 12 2 2 4-4" />
-                      </svg>
-                    </div>
-                    <span>Revisão de Literatura e Análise do Estado da Arte</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="rounded-full bg-primary/10 p-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-primary"
-                      >
-                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                        <path d="m9 12 2 2 4-4" />
-                      </svg>
-                    </div>
-                    <span>Formulação de Hipóteses e Design Experimental</span>
-                  </li>
+                  
+                  
                   <li className="flex items-center gap-2">
                     <div className="rounded-full bg-primary/10 p-1">
                       <svg

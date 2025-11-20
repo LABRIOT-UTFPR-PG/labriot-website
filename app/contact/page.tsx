@@ -120,17 +120,6 @@ export default function ContactPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-start space-x-4">
-                      <Phone className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <h3 className="font-medium">Telefone</h3>
-                        <p className="text-sm text-muted-foreground">
-                          <Link href="tel:+551155550123" className="hover:underline">
-                            +55 (11) 5555-0123
-                          </Link>
-                        </p>
-                      </div>
-                    </div>
                   </CardContent>
                 </Card>
                 <div className="mt-8 aspect-video relative rounded-lg overflow-hidden">
@@ -197,9 +186,8 @@ export default function ContactPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="research-collaboration">Colaboração em Pesquisa</SelectItem>
-                          <SelectItem value="industry-partnership">Parceria com a Indústria</SelectItem>
-                          <SelectItem value="media-inquiry">Consulta de Mídia</SelectItem>
-                          <SelectItem value="career-opportunity">Oportunidade de Carreira</SelectItem>
+                          <SelectItem value="industry-partnership">Parceria Empresarial</SelectItem>
+                          <SelectItem value="media-inquiry">Visita Técnica</SelectItem>
                           <SelectItem value="general-inquiry">Consulta Geral</SelectItem>
                         </SelectContent>
                       </Select>
@@ -214,19 +202,25 @@ export default function ContactPage() {
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="autonomous-systems" id="autonomous-systems" />
                           <Label htmlFor="autonomous-systems" className="font-normal">
-                            Sistemas Autônomos
+                            Agentes Inteligentes
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="machine-learning" id="machine-learning" />
                           <Label htmlFor="machine-learning" className="font-normal">
-                            Aprendizado de Máquina
+                            Inteligência Artificial
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="human-robot-interaction" id="human-robot-interaction" />
                           <Label htmlFor="human-robot-interaction" className="font-normal">
-                            Interação Humano-Robô
+                            Robótica
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="autonomous-systems" id="autonomous-systems" />
+                          <Label htmlFor="autonomous-systems" className="font-normal">
+                            Consulta Acadêmica
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -271,25 +265,12 @@ export default function ContactPage() {
             <div className="mx-auto grid max-w-5xl gap-8 py-12 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>Como posso colaborar com o Labriot em pesquisas?</CardTitle>
+                  <CardTitle>Como posso colaborar com o Labriot?</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Recebemos colaborações com instituições acadêmicas, parceiros da indústria e agências
-                    governamentais. Entre em contato conosco através do formulário acima, especificando seus interesses
+                    Estamos abertos à colaborações com instituições acadêmicas e empresas de diversos ramos. Entre em contato conosco através do formulário acima, especificando seus interesses
                     de pesquisa e potenciais áreas de colaboração.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Vocês oferecem estágios ou posições de pesquisa?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Sim, regularmente oferecemos estágios e posições de pesquisa para estudantes de graduação e
-                    pós-graduação. Visite nossa página de Carreiras para vagas atuais ou entre em contato diretamente
-                    conosco.
                   </p>
                 </CardContent>
               </Card>
@@ -300,19 +281,7 @@ export default function ContactPage() {
                 <CardContent>
                   <p className="text-muted-foreground">
                     Oferecemos visitas agendadas para parceiros acadêmicos e da indústria. Entre em contato conosco com
-                    pelo menos duas semanas de antecedência para agendar uma visita. Por motivos de segurança, todos os
-                    visitantes devem ser pré-aprovados.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Como posso me manter atualizado sobre sua pesquisa?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Você pode assinar nossa newsletter, seguir nosso blog ou se conectar conosco nas plataformas de
-                    mídia social. Publicamos regularmente atualizações sobre nossa pesquisa, eventos e publicações.
+                    pelo menos duas semanas de antecedência para agendar uma visita.
                   </p>
                 </CardContent>
               </Card>

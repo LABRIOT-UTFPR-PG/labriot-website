@@ -1,0 +1,2 @@
+npm run admin:register
+npm run db:init
