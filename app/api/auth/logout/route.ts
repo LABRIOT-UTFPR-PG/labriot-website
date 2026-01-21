@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-// Uma função de logout para ser usada por ambos os métodos GET e POST
-async function performLogout() {
-  const cookieStore = await cookies(); // Adicione 'await' aqui também
-  cookieStore.set('token', '', { httpOnly: true, path: '/', maxAge: 0 });
-  return NextResponse.json({ message: 'Logout bem-sucedido' });
-}
+export const runtime = 'nodejs';
 
-export async function GET() {
-  return performLogout();
+async function performLogout() {
+  const cookieStore = cookies();
+
+  cookieStore.set('token', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    expires: new Date(0),
+    path: '/',
+  });
+
+  return NextResponse.json({ message: 'Logout bem-sucedido' });
 }
 
 export async function POST() {
