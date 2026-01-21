@@ -1,7 +1,7 @@
+export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-export const runtime = 'nodejs';
 
 async function performLogout() {
   const cookieStore = cookies();
@@ -16,6 +16,4 @@ async function performLogout() {
   return NextResponse.json({ message: 'Logout bem-sucedido' });
 }
 
-export async function POST() {
-  return performLogout();
-}
+
