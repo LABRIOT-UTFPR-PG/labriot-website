@@ -4,7 +4,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
-const SECRET_KEY = process.env.JWT_SECRET;
+const SECRET_KEY = process.env.JWT_SECRET as string;
+if (!SECRET_KEY) {
+  throw new Error('JWT_SECRET não definido');
+}
 
 export async function POST(request: Request) {
   try {
@@ -28,7 +31,7 @@ export async function POST(request: Request) {
     });
 
     // CORREÇÃO: Adicione o 'await' antes de cookies()
-    const cookieStore = await cookies(); 
+    const cookieStore = cookies(); 
     
     cookieStore.set('token', token, {
       httpOnly: true,
