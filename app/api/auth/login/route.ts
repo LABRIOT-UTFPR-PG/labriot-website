@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const { username, password } = await request.json();
     const db = await openDb();
 
-    const user = await db.get('SELECT * FROM users WHERE username = ?', [username]);
+    const user = await db.get('SELECT * FROM users WHERE username = $1', [username]);
 
     if (!user) {
       return new Response('Credenciais inválidas', { status: 401 });

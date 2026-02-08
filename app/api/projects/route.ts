@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const { title, description, status, startDate, endDate, image } = data;
 
   const result = await db.run(
-    'INSERT INTO projects (title, description, status, startDate, endDate, image) VALUES (?, ?, ?, ?, ?, ?)',
+    'INSERT INTO projects (title, description, status, startDate, endDate, image) VALUES ($1, $2, $3, $4, $5, $6)',
     [title, description, status, startDate, endDate, image]
   );
 

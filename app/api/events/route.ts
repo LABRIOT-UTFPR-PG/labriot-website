@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const { title, description, date, time, location } = data;
 
   const result = await db.run(
-    'INSERT INTO events (title, description, date, time, location) VALUES (?, ?, ?, ?, ?)',
+    'INSERT INTO events (title, description, date, time, location) VALUES ($1, $2, $3, $4, $5)',
     [title, description, date, time, location]
   );
 

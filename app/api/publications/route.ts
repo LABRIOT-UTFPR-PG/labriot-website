@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const { title, authors, journal, year, doi, description } = data;
 
   const result = await db.run(
-    'INSERT INTO publications (title, authors, journal, year, doi, description) VALUES (?, ?, ?, ?, ?, ?)',
+    'INSERT INTO publications (title, authors, journal, year, doi, description) VALUES ($1, $2, $3, $4, $5, $6)',
     [title, authors, journal, year, doi, description]
   );
 

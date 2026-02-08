@@ -3,7 +3,7 @@ import { openDb } from '@/lib/db';
 
 export async function GET(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  const member = await db.get('SELECT * FROM team WHERE id = ?', [context.params.id]);
+  const member = await db.get('SELECT * FROM team WHERE id = $1', [context.params.id]);
   if (!member) {
     return new Response('Membro não encontrado', { status: 404 });
   }
@@ -20,7 +20,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   const category = "students";
 
   await db.run(
-    'UPDATE team SET name = ?, role = ?, specialization = ?, category = ?, image = ?, linkedin = ? WHERE id = ?',
+    'UPDATE team SET name = $1, role = $2, specialization = $3, category = $4, image = $5, linkedin = $6 WHERE id = $7',
     [name, role, specialization, category, image, linkedin, context.params.id]
   );
 
@@ -29,6 +29,6 @@ export async function PUT(request: Request, context: { params: { id: string } })
 
 export async function DELETE(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  await db.run('DELETE FROM team WHERE id = ?', [context.params.id]);
+  await db.run('DELETE FROM team WHERE id = $1', [context.params.id]);
   return new Response(null, { status: 204 });
 }

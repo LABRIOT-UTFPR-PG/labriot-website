@@ -3,7 +3,7 @@ import { openDb } from '@/lib/db';
 
 export async function GET(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  const publication = await db.get('SELECT * FROM publications WHERE id = ?', [context.params.id]);
+  const publication = await db.get('SELECT * FROM publications WHERE id = $1', [context.params.id]);
   if (!publication) {
     return new Response('Publicação não encontrada', { status: 404 });
   }
@@ -16,7 +16,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   const { title, authors, journal, year, doi } = data;
 
   await db.run(
-    'UPDATE publications SET title = ?, authors = ?, journal = ?, year = ?, doi = ? WHERE id = ?',
+    'UPDATE publications SET title = $1, authors = $2, journal = $3, year = $4, doi = $5 WHERE id = $6',
     [title, authors, journal, year, doi, context.params.id]
   );
 
@@ -25,6 +25,6 @@ export async function PUT(request: Request, context: { params: { id: string } })
 
 export async function DELETE(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  await db.run('DELETE FROM publications WHERE id = ?', [context.params.id]);
+  await db.run('DELETE FROM publications WHERE id = $1', [context.params.id]);
   return new Response(null, { status: 204 });
 }

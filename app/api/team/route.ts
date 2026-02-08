@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const category = "students";
 
   const result = await db.run(
-    'INSERT INTO team (name, role, specialization, category, image, linkedin) VALUES (?, ?, ?, ?, ?, ?)',
+    'INSERT INTO team (name, role, specialization, category, image, linkedin) VALUES ($1, $2, $3, $4, $5, $6)',
     [name, role, specialization, category, image, linkedin]
   );
 
