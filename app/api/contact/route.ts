@@ -6,6 +6,12 @@ export async function POST(request: Request) {
   try {
     const { name, email, organization, inquiryType, message, interest } = await request.json();
 
+    if (!name || !email || !message) {
+      return NextResponse.json(
+        { message: 'Campos obrigatórios faltando' },
+        { status: 400 }
+      );
+    }
     // Crie um transportador do nodemailer
     const transporter = nodemailer.createTransport({
       service: 'gmail', // ou outro provedor de e-mail
