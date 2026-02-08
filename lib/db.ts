@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 
 // Conexão com Neon usando a Connection String
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL_UNPOOLED,
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
