@@ -1,39 +1,61 @@
-import { openDb } from '../lib/db';
+import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import readline from 'readline';
+import dotenv from 'dotenv';
+
+// Carregar variáveis de ambiente
+dotenv.config({ path: '.env.local' });
+
+const { Pool } = pg;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
+function question(query) {
+  return new Promise(resolve => rl.question(query, resolve));
+}
+
 async function registerAdmin() {
-  rl.question('Digite o nome de usuário: ', async (username) => {
-    rl.question('Digite a senha: ', async (password) => {
-      if (!username || !password) {
-        console.error('Usuário e senha são obrigatórios.');
-        rl.close();
-        return;
-      }
+  const client = await pool.connect();
+  
+  try {
+    const username = await question('Digite o nome de usuário: ');
+    const password = await question('Digite a senha: ');
 
-      const db = await openDb();
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+    if (!username || !password) {
+      console.error('❌ Usuário e senha são obrigatórios.');
+      return;
+    }
 
-      try {
-        await db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword]);
-        console.log(`Usuário '${username}' criado com sucesso.`);
-      } catch (error) {
-        if (error.code === 'SQLITE_CONSTRAINT') {
-          console.error(`Erro: O nome de usuário '${username}' já existe.`);
-        } else {
-          console.error('Ocorreu um erro:', error.message);
-        }
-      } finally {
-        rl.close();
-      }
-    });
-  });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await client.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2)',
+      [username, hashedPassword]
+    );
+
+    console.log(`✅ Admin '${username}' registrado com sucesso!`);
+  } catch (error) {
+    if (error.code === '23505') { // PostgreSQL unique violation
+      console.error(`❌ Erro: O usuário '${username}' já existe!`);
+    } else {
+      console.error('❌ Erro ao registrar admin:', error);
+    }
+  } finally {
+    client.release();
+    await pool.end();
+    rl.close();
+  }
 }
 
 registerAdmin();

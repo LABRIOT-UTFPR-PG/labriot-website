@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:init": "jiti ./scripts/init-db.mjs",
-    "admin:register": "jiti ./scripts/register-admin.mjs"
+    "db:init": "node scripts/init-db.mjs",
+    "db:seed": "node scripts/seed-db.mjs",
+    "admin:register": "node scripts/register-admin.mjs",
+    "admin:remove": "node scripts/remove-admin.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -46,6 +48,7 @@
     "cmdk": "1.0.4",
     "cookies-next": "^4.2.1",
     "date-fns": "^3.0.0",
+    "dotenv": "^17.2.4",
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "jose": "^6.1.0",
