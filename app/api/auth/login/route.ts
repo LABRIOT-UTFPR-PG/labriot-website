@@ -11,13 +11,19 @@ if (!SECRET_KEY) {
   throw new Error('JWT_SECRET não definido');
 }
 
+interface User {
+  id: number;
+  username: string;
+  password: string;
+}
+
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
     const db = await openDb();
 
-    const user = await db.get('SELECT * FROM users WHERE username = ?', [username]);
-
+    const user = await db.get<User>('SELECT * FROM users WHERE username = ?', [username]);
+    
     if (!user) {
       return new Response('Credenciais inválidas', { status: 401 });
     }
@@ -29,11 +35,10 @@ export async function POST(request: Request) {
     }
 
     const token = jwt.sign({ userId: user.id, username: user.username }, SECRET_KEY, {
-      expiresIn: '1h',
+      expiresIn: '48h',
     });
 
-    // CORREÇÃO: Adicione o 'await' antes de cookies()
-    const cookieStore = cookies(); 
+    const cookieStore = await cookies(); 
     
     cookieStore.set('token', token, {
       httpOnly: true,
