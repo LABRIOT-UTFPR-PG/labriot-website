@@ -10,18 +10,13 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     if (!token) {
-      console.log("🚫 [Middleware]: Acesso negado. Nenhum token encontrado no cookie.")
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
 
     try {
       await jose.jwtVerify(token, SECRET)
-      console.log("✅ [Middleware]: Token válido para:", pathname)
       return NextResponse.next()
-    } catch (error: any) {
-      console.error("❌ [Middleware]: Erro na verificação do JWT:", error.code || error.message)
-      // Se o erro for 'ERR_JWT_EXPIRED', o problema é o tempo do token.
-      // Se for 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED', as chaves SECRET não batem.
+    } catch {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
@@ -30,5 +25,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'], // Protege /admin e todas as sub-rotas
+  matcher: ['/admin/:path*'],
 }
