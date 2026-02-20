@@ -16,6 +16,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true) // ← faltava isso
 
     const response = await fetch("/api/auth/login", {
       method: "POST",
@@ -23,12 +24,13 @@ export default function LoginPage() {
       body: JSON.stringify({ username, password }),
     })
 
+    setIsLoading(false) // ← e isso
+
     if (response.ok) {
       toast({
         title: "Login bem-sucedido",
         description: "Você será redirecionado para o painel de administração.",
       })
-      // ✅ força reload completo para o middleware ler o cookie corretamente
       window.location.href = "/admin"
     } else {
       toast({
