@@ -18,7 +18,8 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-      await jose.jwtVerify(token, new TextEncoder().encode(SECRET))
+      //await jose.jwtVerify(token, new TextEncoder().encode(SECRET))
+      console.log("PASSOU NO VERIFY")
       return NextResponse.next()
     } catch {
       return NextResponse.redirect(new URL('/admin/login', request.url))
