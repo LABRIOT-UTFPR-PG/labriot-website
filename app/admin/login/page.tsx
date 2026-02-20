@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast"
 export default function LoginPage() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +28,8 @@ export default function LoginPage() {
         title: "Login bem-sucedido",
         description: "Você será redirecionado para o painel de administração.",
       })
-      router.push("/admin")
+      // ✅ força reload completo para o middleware ler o cookie corretamente
+      window.location.href = "/admin"
     } else {
       toast({
         title: "Erro de login",
@@ -68,8 +70,8 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              Entrar
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
