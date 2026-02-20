@@ -8,15 +8,23 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('token')?.value
 
+  console.log('=== MIDDLEWARE ===')
+  console.log('PATH:', pathname)
+  console.log('JWT_SECRET:', process.env.JWT_SECRET)
+  console.log('TOKEN:', token)
+
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     if (!token) {
+      console.log('❌ Sem token — redirecionando para login')
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
 
     try {
-      await jose.jwtVerify(token, new TextEncoder().encode(SECRET_KEY));
+      await jose.jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET))
+      console.log('✅ Token válido')
       return NextResponse.next()
     } catch (error) {
+      console.log('❌ Token inválido:', error)
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
