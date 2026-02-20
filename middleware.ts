@@ -24,10 +24,10 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
-
+  console.log("TOKEN:", token)
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*'],
 }
