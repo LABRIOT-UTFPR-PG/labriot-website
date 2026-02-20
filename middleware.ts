@@ -4,27 +4,24 @@ import * as jose from 'jose'
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET)
 
-if (!SECRET) {
-  throw new Error("JWT_SECRET não definido")
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('token')?.value
 
-  // Proteção de rotas admin
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     if (!token) {
+      console.log("🚫 [Middleware]: Acesso negado. Nenhum token encontrado no cookie.")
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
 
     try {
-      // Verificação padronizada
       await jose.jwtVerify(token, SECRET)
+      console.log("✅ [Middleware]: Token válido para:", pathname)
       return NextResponse.next()
-    } catch (error) {
-      // Se o token for inválido ou expirado, redireciona
-      console.error("Erro JWT:", error)
+    } catch (error: any) {
+      console.error("❌ [Middleware]: Erro na verificação do JWT:", error.code || error.message)
+      // Se o erro for 'ERR_JWT_EXPIRED', o problema é o tempo do token.
+      // Se for 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED', as chaves SECRET não batem.
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
@@ -33,5 +30,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*'],
+  matcher: ['/admin/:path*'], // Protege /admin e todas as sub-rotas
 }
