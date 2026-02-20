@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import { openDb } from '@/lib/db'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 
-const SECRET_KEY = process.env.JWT_SECRET!
+const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET!)
 
 export async function POST(request: Request) {
   try {
@@ -25,11 +25,14 @@ export async function POST(request: Request) {
       return new NextResponse('Credenciais inválidas', { status: 401 })
     }
 
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      SECRET_KEY,
-      { expiresIn: '1h' }
-    )
+    const token = await new jose.SignJWT({ 
+        userId: user.id, 
+        username: user.username 
+      })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(SECRET_KEY)
 
     const response = NextResponse.json({ message: 'Login bem-sucedido' })
 
@@ -37,8 +40,8 @@ export async function POST(request: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60,
-      path: '/',        // 🔥 ESSENCIAL
-      sameSite: 'lax',  // 🔥 IMPORTANTE
+      path: '/',
+      sameSite: 'lax',
     })
 
     return response
