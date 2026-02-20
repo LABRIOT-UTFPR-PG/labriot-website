@@ -51,7 +51,7 @@ useEffect(() => {
             </Button>
           </Link>
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/admin/logout">
+            <Link href="/admin/logout" prefetch={false}>
               <LogOut className="h-5 w-5" />
               <span className="sr-only">Sair</span>
             </Link>
