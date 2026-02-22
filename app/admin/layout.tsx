@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, type ReactNode } from "react"
+import { type ReactNode } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -16,20 +16,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const isLoginPage = pathname === '/admin/login';
-
-useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Envia um POST request para a rota de logout.
-      // O corpo da requisição é necessário para o sendBeacon funcionar como POST.
-      navigator.sendBeacon('/api/auth/logout', new Blob());
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -81,7 +67,7 @@ useEffect(() => {
                       <FileText className="mr-2 h-4 w-4" />
                       Pesquisas
                     </Link>
-                  </Button>*/}
+                  </Button> */}
                   
                   <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/projects">
@@ -107,12 +93,12 @@ useEffect(() => {
                       Blog
                     </Link>
                   </Button>
-                  {<Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/events">
                       <Calendar className="mr-2 h-4 w-4" />
                       Eventos
                     </Link>
-                  </Button>}
+                  </Button>
                 </div>
               </div>
               <div className="px-2 py-2">

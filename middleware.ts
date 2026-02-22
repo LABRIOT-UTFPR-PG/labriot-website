@@ -2,9 +2,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import * as jose from 'jose'
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET)
+// Remova o const SECRET daqui de fora
 
 export async function middleware(request: NextRequest) {
+  // Inicialize o SECRET aqui DENTRO da função
+  const SECRET = new TextEncoder().encode(process.env.JWT_SECRET)
+
   const { pathname } = request.nextUrl
   const token = request.cookies.get('token')?.value
 
@@ -17,6 +20,7 @@ export async function middleware(request: NextRequest) {
       await jose.jwtVerify(token, SECRET)
       return NextResponse.next()
     } catch {
+      // Se houver erro, a página recarregará no login
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
