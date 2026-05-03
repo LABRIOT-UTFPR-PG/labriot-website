@@ -3,32 +3,33 @@ import { openDb } from '@/lib/db';
 
 export async function GET(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  const member = await db.get('SELECT * FROM team WHERE id = ?', [context.params.id]);
+  const member = await db.get('SELECT * FROM team WHERE id = $1', [context.params.id]);
   if (!member) {
     return new Response('Membro não encontrado', { status: 404 });
   }
   return NextResponse.json(member);
 }
 
-export async function PUT(request: Request, context: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
   const db = await openDb();
   const data = await request.json();
-  // Adicionado linkedin na extração
-  const { name, specialization, image, linkedin } = data;
+  const { name, specialization, image, linkedin, category } = data;
+  
+  const params = await context.params;
 
   const role = "Pesquisador";
-  const category = "students";
+  const finalCategory = category || "students";
 
   await db.run(
-    'UPDATE team SET name = ?, role = ?, specialization = ?, category = ?, image = ?, linkedin = ? WHERE id = ?',
-    [name, role, specialization, category, image, linkedin, context.params.id]
+    'UPDATE team SET name = $1, role = $2, specialization = $3, category = $4, image = $5, linkedin = $6 WHERE id = $7',
+    [name, role, specialization, finalCategory, image, linkedin, params.id]
   );
 
-  return NextResponse.json({ id: context.params.id, ...data, role, category });
+  return NextResponse.json({ id: params.id, ...data, role, category: finalCategory });
 }
 
 export async function DELETE(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  await db.run('DELETE FROM team WHERE id = ?', [context.params.id]);
+  await db.run('DELETE FROM team WHERE id = $1', [context.params.id]);
   return new Response(null, { status: 204 });
 }

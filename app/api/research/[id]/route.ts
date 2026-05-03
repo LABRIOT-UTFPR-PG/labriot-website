@@ -3,7 +3,7 @@ import { openDb } from '@/lib/db';
 
 export async function GET(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  const research = await db.get('SELECT * FROM research WHERE id = ?', [context.params.id]);
+  const research = await db.get('SELECT * FROM research WHERE id = $1', [context.params.id]);
   if (!research) {
     return new Response('Área de pesquisa não encontrada', { status: 404 });
   }
@@ -16,7 +16,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   const { title, description } = data;
 
   await db.run(
-    'UPDATE research SET title = ?, description = ? WHERE id = ?',
+    'UPDATE research SET title = $1, description = $2 WHERE id = $3',
     [title, description, context.params.id]
   );
 
@@ -25,6 +25,6 @@ export async function PUT(request: Request, context: { params: { id: string } })
 
 export async function DELETE(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  await db.run('DELETE FROM research WHERE id = ?', [context.params.id]);
+  await db.run('DELETE FROM research WHERE id = $1', [context.params.id]);
   return new Response(null, { status: 204 });
 }

@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, type ReactNode } from "react"
-import { usePathname, useRouter } from "next/navigation"
+import { type ReactNode } from "react"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { LayoutDashboard, FileText, Users, Folder, BookOpen, Calendar, Settings, LogOut } from "lucide-react"
@@ -13,23 +13,8 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const isLoginPage = pathname === '/admin/login';
-
-useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Envia um POST request para a rota de logout.
-      // O corpo da requisição é necessário para o sendBeacon funcionar como POST.
-      navigator.sendBeacon('/api/auth/logout', new Blob());
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
 
   return (
     <div className="flex min-h-screen flex-col">

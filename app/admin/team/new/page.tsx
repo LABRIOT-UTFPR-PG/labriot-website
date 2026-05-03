@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function NewTeamMember() {
   const [name, setName] = useState('');
   const [specialization, setSpecialization] = useState('');
+  const [category, setCategory] = useState('Equipe'); // Novo estado para o grupo/setor
   const [image, setImage] = useState('');
   const [linkedin, setLinkedin] = useState(''); // Novo estado
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function NewTeamMember() {
     await fetch('/api/team', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, specialization, image, linkedin }), // Enviando linkedin
+      body: JSON.stringify({ name, specialization, image, linkedin, category }), // Enviando category
     });
     router.push('/admin/team');
   };
@@ -37,8 +38,18 @@ export default function NewTeamMember() {
                         <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
                     </div>
                     <div>
-                        <Label htmlFor="specialization">Especialização</Label>
+                        <Label htmlFor="specialization">Especialização / Cargo</Label>
                         <Input id="specialization" value={specialization} onChange={(e) => setSpecialization(e.target.value)} />
+                    </div>
+                    <div>
+                        <Label htmlFor="category">Setor / Grupo</Label>
+                        <Input 
+                          id="category" 
+                          value={category} 
+                          onChange={(e) => setCategory(e.target.value)} 
+                          placeholder="Ex: Professores, Liderança, Alunos de Mestrado" 
+                          required 
+                        />
                     </div>
                     <div>
                         <Label htmlFor="linkedin">LinkedIn (URL)</Label>

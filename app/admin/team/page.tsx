@@ -1,34 +1,15 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Plus, Search, Edit, Trash2, Eye } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Plus, Search, Edit, Eye } from "lucide-react"
+import { openDb } from "@/lib/db"
+import DeleteMemberButton from "@/components/delete-member-button"
 
-export default function TeamAdmin() {
-  const [team, setTeam] = useState<any[]>([])
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/team')
-      .then(res => res.json())
-      .then(data => {
-        setTeam(data)
-        setLoading(false)
-      })
-  }, [])
-
-  const handleDelete = async (id: number) => {
-    if (confirm('Tem certeza que deseja excluir este membro?')) {
-      await fetch(`/api/team/${id}`, { method: 'DELETE' });
-      setTeam(team.filter(member => member.id !== id));
-    }
-  }
-
-  if (loading) return <div>Carregando...</div>
+export default async function TeamAdmin() {
+  const db = await openDb()
+  const team = await db.all('SELECT * FROM team ORDER BY id DESC')
 
   return (
     <div className="space-y-6">
@@ -71,10 +52,7 @@ export default function TeamAdmin() {
                     Editar
                   </Link>
                 </Button>
-                <Button variant="outline" size="sm" className="text-destructive" onClick={() => handleDelete(member.id)}>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Excluir
-                </Button>
+                <DeleteMemberButton id={member.id} />
               </div>
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/team/${member.id}`} target="_blank">

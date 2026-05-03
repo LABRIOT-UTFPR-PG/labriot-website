@@ -1,51 +1,55 @@
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 
-// Criação do Pool de conexões (mais eficiente que abrir/fechar toda hora)
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: Number(process.env.DB_PORT) || 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+// Pool criado de forma LAZY (na primeira chamada, não na importação do módulo).
+// Isso garante que process.env.DATABASE_URL já está disponível, independentemente
+// de quando o módulo foi importado (scripts, testes, etc).
+let _pool: Pool | null = null;
 
-// Esta função simula a API do SQLite usando MySQL
+function getPool(): Pool {
+  if (!_pool) {
+    const connectionString = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
+    if (!connectionString) {
+      throw new Error(
+        '[db.ts] DATABASE_URL não definida. Verifique seu arquivo .env.local.'
+      );
+    }
+    _pool = new Pool({
+      connectionString,
+      ssl: { rejectUnauthorized: false },
+    });
+  }
+  return _pool;
+}
+
 export async function openDb() {
   return {
-    // Simula db.all (retorna todas as linhas)
     all: async (query: string, params?: any[]) => {
-      const [rows] = await pool.execute(query, params);
-      return rows;
-    },
-    
-    // Simula db.get (retorna apenas a primeira linha)
-    get: async (query: string, params?: any[]) => {
-      const [rows] = await pool.execute(query, params);
-      if (Array.isArray(rows) && rows.length > 0) {
-        return rows[0];
-      }
-      return null;
+      const result = await getPool().query(query, params);
+      return result.rows;
     },
 
-    // Simula db.run (para INSERT, UPDATE, DELETE)
-    // O SQLite retorna { lastID }, o MySQL retorna { insertId }. Aqui fazemos a conversão.
+    get: async (query: string, params?: any[]) => {
+      const result = await getPool().query(query, params);
+      return result.rows[0] || null;
+    },
+
     run: async (query: string, params?: any[]) => {
-      const [result] = await pool.execute(query, params);
-      const header = result as any; // ResultSetHeader do mysql2
-      
+      const result = await getPool().query(query, params);
       return {
-        lastID: header.insertId,
-        changes: header.affectedRows
+        lastID: result.rows[0]?.id || null,
+        changes: result.rowCount || 0,
       };
     },
 
-    // Função extra caso precise rodar scripts puros
     exec: async (query: string) => {
-      const [result] = await pool.query(query);
-      return result;
-    }
+      return getPool().query(query);
+    },
   };
 }
+
+export async function closeDb() {
+  if (_pool) {
+    await _pool.end();
+    _pool = null;
+  }
+}

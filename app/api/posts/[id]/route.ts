@@ -3,7 +3,7 @@ import { openDb } from '@/lib/db';
 
 export async function GET(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  const post = await db.get('SELECT * FROM posts WHERE id = ?', [context.params.id]);
+  const post = await db.get('SELECT * FROM posts WHERE id = $1', [context.params.id]);
   if (!post) {
     return new Response('Post não encontrado', { status: 404 });
   }
@@ -16,7 +16,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   const { title, summary, content, author, date, image } = data;
 
   await db.run(
-    'UPDATE posts SET title = ?, summary = ?, content = ?, author = ?, date = ?, image = ? WHERE id = ?',
+    'UPDATE posts SET title = $1, summary = $2, content = $3, author = $4, date = $5, image = $6 WHERE id = $7',
     [title, summary, content, author, date, image, context.params.id]
   );
 
@@ -25,6 +25,6 @@ export async function PUT(request: Request, context: { params: { id: string } })
 
 export async function DELETE(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  await db.run('DELETE FROM posts WHERE id = ?', [context.params.id]);
+  await db.run('DELETE FROM posts WHERE id = $1', [context.params.id]);
   return new Response(null, { status: 204 });
 }

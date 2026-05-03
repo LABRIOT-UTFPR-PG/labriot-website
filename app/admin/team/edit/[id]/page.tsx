@@ -11,6 +11,7 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
   const [id, setId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [specialization, setSpecialization] = useState('');
+  const [category, setCategory] = useState(''); // Novo estado para grupo
   const [image, setImage] = useState('');
   const [linkedin, setLinkedin] = useState(''); // Novo estado
   const [loading, setLoading] = useState(true);
@@ -32,6 +33,7 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
         .then(data => {
           setName(data.name || '');
           setSpecialization(data.specialization || '');
+          setCategory(data.category || 'Equipe');
           setImage(data.image || '');
           setLinkedin(data.linkedin || ''); // Carrega linkedin
           setLoading(false);
@@ -50,7 +52,7 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
     await fetch(`/api/team/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, specialization, image, linkedin }), // Salva linkedin
+      body: JSON.stringify({ name, specialization, category, image, linkedin }), // Salva category e linkedin
     });
     router.push('/admin/team');
   };
@@ -70,8 +72,18 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
                         <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
                     </div>
                     <div>
-                        <Label htmlFor="specialization">Especialização</Label>
+                        <Label htmlFor="specialization">Especialização / Cargo</Label>
                         <Input id="specialization" value={specialization} onChange={(e) => setSpecialization(e.target.value)} />
+                    </div>
+                    <div>
+                        <Label htmlFor="category">Setor / Grupo</Label>
+                        <Input 
+                          id="category" 
+                          value={category} 
+                          onChange={(e) => setCategory(e.target.value)} 
+                          placeholder="Ex: Professores, Liderança, Alunos de Mestrado" 
+                          required 
+                        />
                     </div>
                     <div>
                         <Label htmlFor="linkedin">LinkedIn (URL)</Label>

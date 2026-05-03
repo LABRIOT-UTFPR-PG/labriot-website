@@ -18,7 +18,7 @@ export default function Home() {
       <SiteHeader />
 
       {/* Seção 1: Hero / Preto */}
-      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-black">
+      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-background">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
             <div className="flex flex-col justify-center space-y-4">
@@ -49,7 +49,7 @@ export default function Home() {
       </section>
       
       {/* Seção 2: Missão / Cinza */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-black-1000">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-background-1000">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
@@ -124,7 +124,7 @@ export default function Home() {
       </section>
 
       {/* Seção 3: Projetos em Destaque - ID ADICIONADO */}
-      <section id="projects" className="w-full py-12 md:py-24 lg:py-32 bg-black scroll-mt-16">
+      <section id="projects" className="w-full py-12 md:py-24 lg:py-32 bg-background scroll-mt-16">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
@@ -148,7 +148,7 @@ export default function Home() {
       </section>
 
       {/* Seção 4: Conheça Nossa Equipe - ID ADICIONADO */}
-      <section id="team" className="w-full py-12 md:py-24 lg:py-32 bg-black-1000 scroll-mt-16">
+      <section id="team" className="w-full py-12 md:py-24 lg:py-32 bg-background-1000 scroll-mt-16">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
@@ -172,7 +172,7 @@ export default function Home() {
       </section>
 
       {/* Seção 5: Eventos - ID ADICIONADO */}
-      <section id="events" className="w-full py-12 md:py-24 lg:py-32 bg-black scroll-mt-16">
+      <section id="events" className="w-full py-12 md:py-24 lg:py-32 bg-background scroll-mt-16">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">
              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Agenda do Labriot</h2>
@@ -194,7 +194,7 @@ export default function Home() {
       </section>
 
       {/* Seção 6: Colabore (Contato) - ID ADICIONADO */}
-      <section id="contact" className="w-full py-12 md:py-24 lg:py-32 bg-black-1000 scroll-mt-16">
+      <section id="contact" className="w-full py-12 md:py-24 lg:py-32 bg-background-1000 scroll-mt-16">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
           <div className="space-y-3">
             <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Colabore com o Labriot</h2>

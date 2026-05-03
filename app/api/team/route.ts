@@ -10,16 +10,16 @@ export async function GET() {
 export async function POST(request: Request) {
   const db = await openDb();
   const data = await request.json();
-  // Adicionado linkedin na extração
-  const { name, specialization, image, linkedin } = data;
+  const { name, specialization, image, linkedin, category } = data;
   
   const role = "Pesquisador";
-  const category = "students";
+  // Se não enviarem, manter um fallback
+  const finalCategory = category || "students";
 
   const result = await db.run(
-    'INSERT INTO team (name, role, specialization, category, image, linkedin) VALUES (?, ?, ?, ?, ?, ?)',
-    [name, role, specialization, category, image, linkedin]
+    'INSERT INTO team (name, role, specialization, category, image, linkedin) VALUES ($1, $2, $3, $4, $5, $6)',
+    [name, role, specialization, finalCategory, image, linkedin]
   );
 
-  return NextResponse.json({ id: result.lastID, ...data, role, category });
+  return NextResponse.json({ id: result.lastID, ...data, role, category: finalCategory });
 }

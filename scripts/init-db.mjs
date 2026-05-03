@@ -1,18 +1,19 @@
-import { openDb } from '../lib/db';
+import { openDb } from '../lib/db.js';
 import bcrypt from 'bcryptjs';
 
 async function initDb() {
   const db = await openDb();
   
+  // PostgreSQL usa SERIAL ao invés de INTEGER PRIMARY KEY AUTOINCREMENT
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS team (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
       role TEXT NOT NULL,
       specialization TEXT,
@@ -22,7 +23,7 @@ async function initDb() {
     );
 
     CREATE TABLE IF NOT EXISTS projects (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
       description TEXT,
       status TEXT NOT NULL CHECK(status IN ('ongoing', 'completed')),
@@ -32,13 +33,13 @@ async function initDb() {
     );
 
     CREATE TABLE IF NOT EXISTS research (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
       description TEXT
     );
 
     CREATE TABLE IF NOT EXISTS publications (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
       authors TEXT NOT NULL,
       journal TEXT,
@@ -48,7 +49,7 @@ async function initDb() {
     );
 
     CREATE TABLE IF NOT EXISTS posts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
       summary TEXT,
       content TEXT,
@@ -56,8 +57,9 @@ async function initDb() {
       date TEXT,
       image TEXT
     );
+    
     CREATE TABLE IF NOT EXISTS events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
       description TEXT,
       date TEXT NOT NULL,
@@ -70,9 +72,15 @@ async function initDb() {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash('admin', salt);
 
-  await db.run('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ['admin', hashedPassword]);
+  // PostgreSQL usa ON CONFLICT ao invés de INSERT OR IGNORE
+  await db.run(
+    `INSERT INTO users (username, password) 
+     VALUES ($1, $2) 
+     ON CONFLICT (username) DO NOTHING`,
+    ['admin', hashedPassword]
+  );
 
-  console.log('Banco de dados inicializado com sucesso.');
+  console.log('Banco de dados PostgreSQL inicializado com sucesso.');
 }
 
 initDb();
