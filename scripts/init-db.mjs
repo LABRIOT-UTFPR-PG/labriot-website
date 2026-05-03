@@ -1,8 +1,21 @@
 import { openDb } from '../lib/db.js';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+
+// Carregar variáveis de ambiente
+dotenv.config({ path: '.env.local' });
+
+const { Pool } = pg;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 async function initDb() {
-  const db = await openDb();
+  const client = await pool.connect();
   
   // PostgreSQL usa SERIAL ao invés de INTEGER PRIMARY KEY AUTOINCREMENT
   await db.exec(`

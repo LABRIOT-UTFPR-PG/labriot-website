@@ -79,4 +79,4 @@ export async function POST(request: Request) {
     console.error(error);
     return new Response('Ocorreu um erro ao fazer login.', { status: 500 });
   }
-}
+}

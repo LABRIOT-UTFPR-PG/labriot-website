@@ -1,58 +1,61 @@
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-import readline from 'readline';
-import { openDb } from '../lib/db.ts';
+import pg from 'pg';
 import bcrypt from 'bcryptjs';
+import readline from 'readline';
+import dotenv from 'dotenv';
 
-// Carrega o .env.local ANTES de qualquer conexão com o banco.
-// Com o pool lazy em lib/db.ts, isso funciona corretamente.
-try {
-  const envFile = readFileSync(resolve(process.cwd(), '.env.local'), 'utf-8');
-  for (const line of envFile.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eqIndex = trimmed.indexOf('=');
-    if (eqIndex === -1) continue;
-    const key = trimmed.slice(0, eqIndex).trim();
-    const value = trimmed.slice(eqIndex + 1).trim().replace(/^['"]|['"]$/g, '');
-    if (!process.env[key]) process.env[key] = value;
+// Carregar variáveis de ambiente
+dotenv.config({ path: '.env.local' });
+
+const { Pool } = pg;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
   }
-} catch {
-  console.warn('Aviso: não foi possível carregar .env.local');
-}
+});
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
+function question(query) {
+  return new Promise(resolve => rl.question(query, resolve));
+}
+
 async function registerAdmin() {
-  rl.question('Digite o nome de usuário: ', async (username) => {
-    rl.question('Digite a senha: ', async (password) => {
-      if (!username || !password) {
-        console.error('Usuário e senha são obrigatórios.');
-        rl.close();
-        return;
-      }
+  const client = await pool.connect();
 
-      const db = await openDb();
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+  try {
+    const username = await question('Digite o nome de usuário: ');
+    const password = await question('Digite a senha: ');
 
-      try {
-        await db.run('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
-        console.log(`Usuário '${username}' criado com sucesso.`);
-      } catch (error) {
-        if (error.code === '23505') {
-          console.error(`Erro: O nome de usuário '${username}' já existe.`);
-        } else {
-          console.error('Ocorreu um erro:', error.message);
-        }
-      } finally {
-        rl.close();
-      }
-    });
-  });
+    if (!username || !password) {
+      console.error('❌ Usuário e senha são obrigatórios.');
+      return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await client.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2)',
+      [username, hashedPassword]
+    );
+
+    console.log(`✅ Admin '${username}' registrado com sucesso!`);
+  } catch (error) {
+    if (error.code === '23505') {
+      console.error(`❌ Erro: O usuário '${username}' já existe!`);
+    } else {
+      console.error('❌ Erro ao registrar admin:', error);
+    }
+  } finally {
+    client.release();
+    await pool.end();
+    rl.close();
+  }
 }
 
 registerAdmin();

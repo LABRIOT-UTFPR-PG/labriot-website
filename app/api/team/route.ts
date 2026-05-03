@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const db = await openDb();
   const data = await request.json();
   const { name, specialization, image, linkedin, category } = data;
-  
+
   const role = "Pesquisador";
   // Se não enviarem, manter um fallback
   const finalCategory = category || "students";

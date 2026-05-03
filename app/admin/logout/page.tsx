@@ -1,16 +1,18 @@
-"use client"
+"use client";
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { cookies } from 'next/headers';
 
 export default function LogoutPage() {
   const router = useRouter();
 
   useEffect(() => {
     const logout = async () => {
-      await fetch('/api/auth/logout');
-      router.push('/admin/login');
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      router.replace('/admin/login');
     };
 
     logout();

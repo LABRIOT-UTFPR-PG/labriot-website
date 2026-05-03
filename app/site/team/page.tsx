@@ -1,2 +1,4 @@
-// Mover o arquivo existente para o novo diretório
-
+// Exemplo para app/team/page.tsx
+export default function TeamPage() {
+  return <div>Página de Projetos em construção...</div>;
+}

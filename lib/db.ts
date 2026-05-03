@@ -52,4 +52,4 @@ export async function closeDb() {
     await _pool.end();
     _pool = null;
   }
-}
+}

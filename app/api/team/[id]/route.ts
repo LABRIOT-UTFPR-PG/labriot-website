@@ -14,7 +14,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   const db = await openDb();
   const data = await request.json();
   const { name, specialization, image, linkedin, category } = data;
-  
+
   const params = await context.params;
 
   const role = "Pesquisador";

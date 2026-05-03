@@ -36,7 +36,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </Button>
           </Link>
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/admin/logout">
+            <Link href="/admin/logout" prefetch={false}>
               <LogOut className="h-5 w-5" />
               <span className="sr-only">Sair</span>
             </Link>
@@ -66,8 +66,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       <FileText className="mr-2 h-4 w-4" />
                       Pesquisas
                     </Link>
-                  </Button>*/}
-                  
+                  </Button> */}
+
                   <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/projects">
                       <Folder className="mr-2 h-4 w-4" />
@@ -92,12 +92,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       Blog
                     </Link>
                   </Button>
-                  {<Button variant="ghost" className="w-full justify-start" asChild>
+                  <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/events">
                       <Calendar className="mr-2 h-4 w-4" />
                       Eventos
                     </Link>
-                  </Button>}
+                  </Button>
                 </div>
               </div>
               <div className="px-2 py-2">
