@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        api_key: API_KEY || "Y3re1Jjg2qKsMQ4JpoyY", // Usa a chave configurada no .env ou a padrão do snippet
+        api_key: API_KEY,
         inputs: {
           image: {
             type: "base64",
