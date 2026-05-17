@@ -69,11 +69,19 @@ export default function PostPage({ params }: { params: { id: string } }) {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="mx-auto max-w-3xl">
-                <Button variant="outline" asChild className="mb-8">
-                    <Link href="/blog">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Voltar para o Blog
-                    </Link>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    if (typeof window !== "undefined" && window.history.length > 1) {
+                      window.history.back();
+                    } else {
+                      window.location.href = "/blog";
+                    }
+                  }}
+                  className="mb-8 flex items-center gap-2"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Voltar para o Blog
                 </Button>
               <article>
                 <header className="mb-8 border-b pb-4">

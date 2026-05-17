@@ -23,15 +23,31 @@ export function SiteHeader() {
     }
   }
 
+  if (pathname?.startsWith("/admin")) {
+    return null
+  }
+
+  // Se o caminho for uma subpágina de projetos ou blog, ela já possui seu próprio botão de voltar no corpo.
+  const hasCustomBackButton = pathname?.startsWith("/projects/") || pathname?.startsWith("/blog/")
+
+  // Função para voltar de forma inteligente com fallback para a home
+  const handleBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back()
+    } else {
+      router.push("/")
+    }
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          {pathname !== "/" && (
+          {pathname !== "/" && !hasCustomBackButton && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.back()}
+              onClick={handleBack}
               className="mr-2 flex items-center gap-1 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />

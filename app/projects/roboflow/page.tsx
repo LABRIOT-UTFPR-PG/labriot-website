@@ -18,7 +18,7 @@ export default function RoboflowPage() {
     <div className="container mx-auto px-4 py-12 md:py-24 max-w-5xl">
       <div className="mb-8">
         <Button variant="ghost" asChild className="pl-0 hover:bg-transparent">
-          <Link href="/projects" className="flex items-center text-muted-foreground hover:text-foreground">
+          <Link href="/#projects" className="flex items-center text-muted-foreground hover:text-foreground">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar para Projetos
           </Link>

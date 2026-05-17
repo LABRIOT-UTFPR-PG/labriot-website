@@ -82,10 +82,22 @@ export default function ProjectsPage() {
                           {project.description}
                         </p>
                       </CardContent>
-                      <CardFooter>
-                        <Button asChild>
-                          <Link href={project.url || `/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
-                        </Button>
+                      <CardFooter className="pt-0">
+                        {project.url ? (
+                          <Button asChild className="w-full">
+                            <Link 
+                              href={project.url} 
+                              target={project.url.startsWith("http") ? "_blank" : "_self"}
+                              rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
+                            >
+                              Ver Detalhes do Projeto
+                            </Link>
+                          </Button>
+                        ) : (
+                          <Button variant="outline" disabled className="w-full opacity-50 cursor-not-allowed">
+                            Sem Link de Detalhes
+                          </Button>
+                        )}
                       </CardFooter>
                     </Card>
                   ))}
@@ -113,10 +125,22 @@ export default function ProjectsPage() {
                           {project.description}
                         </p>
                       </CardContent>
-                      <CardFooter>
-                        <Button asChild>
-                          <Link href={project.url || `/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
-                        </Button>
+                      <CardFooter className="pt-0">
+                        {project.url ? (
+                          <Button asChild className="w-full">
+                            <Link 
+                              href={project.url} 
+                              target={project.url.startsWith("http") ? "_blank" : "_self"}
+                              rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
+                            >
+                              Ver Detalhes do Projeto
+                            </Link>
+                          </Button>
+                        ) : (
+                          <Button variant="outline" disabled className="w-full opacity-50 cursor-not-allowed">
+                            Sem Link de Detalhes
+                          </Button>
+                        )}
                       </CardFooter>
                     </Card>
                   ))}

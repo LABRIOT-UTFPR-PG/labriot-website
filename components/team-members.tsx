@@ -32,36 +32,44 @@ export default async function TeamMembers() {
       {Object.entries(groupedTeam).map(([category, members]) => (
         <div key={category} className="space-y-8">
           <h3 className="text-2xl font-bold text-center border-b pb-2">{category}</h3>
-          {/* justify-center centraliza os cards quando não preenchem a linha inteira */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 justify-center max-w-5xl mx-auto">
+          {/* flex-wrap e justify-center centralizam perfeitamente os cards mesmo quando há poucos membros */}
+          <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
             {members.map((member) => (
-              <Card key={member.id} className="overflow-hidden w-full max-w-sm mx-auto">
-                <div className="aspect-square relative">
+              <Card key={member.id} className="overflow-hidden w-full max-w-[240px] mx-auto border bg-card shadow-sm hover:shadow-md transition-shadow">
+                <div className="aspect-square relative w-full overflow-hidden">
                   <Image 
                     src={member.image || "/placeholder.svg"} 
                     alt={member.name} 
                     fill 
-                    className="object-cover" 
+                    className="object-cover transition-transform duration-300 hover:scale-105" 
                   />
                 </div>
-                <CardHeader>
-                  <CardTitle>{member.name}</CardTitle>
+                <CardHeader className="p-3">
+                  <CardTitle className="text-base font-bold text-foreground truncate" title={member.name}>
+                    {member.name}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">{member.specialization}</p>
+                <CardContent className="p-3 pt-0 pb-2">
+                  <p className="text-xs text-muted-foreground truncate" title={member.specialization}>
+                    {member.specialization}
+                  </p>
                 </CardContent>
-                <CardFooter>
-                  <Button variant="outline" size="sm" asChild className="w-full">
-                    {/* Redireciona para o LinkedIn se houver, caso contrário fica desabilitado ou link morto */}
-                    <Link 
-                      href={member.linkedin || "#"} 
-                      target={member.linkedin ? "_blank" : "_self"}
-                      rel={member.linkedin ? "noopener noreferrer" : ""}
-                      className={!member.linkedin ? "pointer-events-none opacity-50" : ""}
-                    >
-                      Ver Perfil
-                    </Link>
-                  </Button>
+                <CardFooter className="p-3 pt-0">
+                  {member.linkedin ? (
+                    <Button variant="outline" size="sm" asChild className="w-full h-8 text-xs">
+                      <Link 
+                        href={member.linkedin} 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Ver Perfil
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" disabled className="w-full h-8 text-xs opacity-50 cursor-not-allowed">
+                      Sem Perfil
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             ))}
