@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Nenhuma imagem fornecida" }, { status: 400 });
     }
 
-    const API_KEY = process.env.ROBOFLOW_API_KEY || "Y3re1Jjg2qKsMQ4JpoyY"; // Chave fallback se não configurado no .env
+    const API_KEY = process.env.API_KEY;
 
     // URL pública e correta do endpoint de inferência do seu Workflow de placa mãe (detect-motherboard)
     const roboflowUrl = "https://serverless.roboflow.com/image-jlx1n/workflows/detect-motherboard";
