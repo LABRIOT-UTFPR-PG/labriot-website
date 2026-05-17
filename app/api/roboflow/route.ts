@@ -63,26 +63,28 @@ export async function POST(req: Request) {
     }
 
     // Mapeamento dinâmico para garantir compatibilidade com o frontend
-    // Roboflow Workflows normalmente retorna a resposta estruturada pelos blocos de saída.
-    // Tentamos extrair 'predictions' do primeiro item de output ou do objeto principal.
+    // Roboflow Workflows retorna a resposta estruturada pelos blocos de saída definidos no JSON.
     let predictions = [];
+    let countObjects = 0;
+    let outputImage = null;
+
     if (data.outputs && Array.isArray(data.outputs) && data.outputs.length > 0) {
-      // Procura por predictions dentro de qualquer chave do primeiro output
       const firstOutput = data.outputs[0];
-      for (const key in firstOutput) {
-        if (firstOutput[key] && firstOutput[key].predictions) {
-          predictions = firstOutput[key].predictions;
-          break;
-        } else if (key === "predictions" && Array.isArray(firstOutput[key])) {
-          predictions = firstOutput[key];
-          break;
-        }
-      }
-    } else if (data.predictions) {
-      predictions = data.predictions;
+      predictions = firstOutput.predictions || [];
+      countObjects = typeof firstOutput.count_objects === 'number' ? firstOutput.count_objects : (firstOutput.count_objects?.value || predictions.length);
+      outputImage = firstOutput.output_image?.value || null;
+    } else {
+      predictions = data.predictions || [];
+      countObjects = typeof data.count_objects === 'number' ? data.count_objects : (data.count_objects?.value || predictions.length);
+      outputImage = data.output_image?.value || null;
     }
 
-    return NextResponse.json({ ...data, predictions });
+    return NextResponse.json({ 
+      ...data, 
+      predictions,
+      countObjects,
+      outputImage
+    });
   } catch (error) {
     console.error("Roboflow API Error:", error);
     return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });

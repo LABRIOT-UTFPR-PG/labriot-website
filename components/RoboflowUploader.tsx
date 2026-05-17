@@ -18,6 +18,8 @@ interface Prediction {
 export function RoboflowUploader() {
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [annotatedImage, setAnnotatedImage] = useState<string | null>(null);
+  const [countObjects, setCountObjects] = useState<number | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -87,9 +89,17 @@ export function RoboflowUploader() {
       }
 
       setPredictions(data.predictions || []);
-      
-      // We need a small delay to ensure the image is fully rendered before drawing
-      setTimeout(() => drawPredictions(data.predictions || []), 120);
+      setCountObjects(typeof data.countObjects === 'number' ? data.countObjects : null);
+
+      if (data.outputImage) {
+        const base64Prefix = data.outputImage.startsWith("data:image/") 
+          ? "" 
+          : "data:image/jpeg;base64,";
+        setAnnotatedImage(`${base64Prefix}${data.outputImage}`);
+      } else {
+        setAnnotatedImage(null);
+        setTimeout(() => drawPredictions(data.predictions || []), 120);
+      }
 
       toast.success("Imagem analisada com sucesso!");
     } catch (error: any) {
@@ -113,7 +123,9 @@ export function RoboflowUploader() {
       if (event.target?.result) {
         const base64 = event.target.result as string;
         setSelectedImage(base64);
-        setPredictions([]); // Clear previous predictions
+        setAnnotatedImage(null);
+        setCountObjects(null);
+        setPredictions([]);
         processImage(base64); // Analisa imediatamente!
       }
     };
@@ -153,24 +165,26 @@ export function RoboflowUploader() {
 
         {selectedImage && (
           <div className="relative border rounded-lg overflow-hidden bg-black/5 flex justify-center items-center">
-            {/* Imagem de Fundo */}
+            {/* Imagem de Fundo (Ou a anotada da IA se houver) */}
             <img
               ref={imageRef}
-              src={selectedImage}
+              src={annotatedImage || selectedImage}
               alt="Uploaded"
               className="max-h-[500px] w-auto object-contain"
               onLoad={() => {
-                if (predictions.length > 0) {
+                if (!annotatedImage && predictions.length > 0) {
                   drawPredictions(predictions);
                 }
               }}
             />
-            {/* Canvas para desenhar as marcações por cima */}
-            <canvas
-              ref={canvasRef}
-              className="absolute top-0 left-1/2 -translate-x-1/2"
-              style={{ pointerEvents: "none" }}
-            />
+            {/* Canvas para desenhar as marcações por cima (Apenas se não houver imagem anotada da IA) */}
+            {!annotatedImage && (
+              <canvas
+                ref={canvasRef}
+                className="absolute top-0 left-1/2 -translate-x-1/2"
+                style={{ pointerEvents: "none" }}
+              />
+            )}
           </div>
         )}
 
@@ -183,7 +197,9 @@ export function RoboflowUploader() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {predictions.length > 0
+                {countObjects !== null
+                  ? `Detecção concluída: ${countObjects} componente(s) / placa(s) identificado(s)`
+                  : predictions.length > 0
                   ? `Detecção concluída: ${predictions.length} objeto(s) identificado(s)`
                   : selectedImage
                   ? "Imagem pronta para análise"
@@ -193,7 +209,7 @@ export function RoboflowUploader() {
           </div>
           
           <div className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full border">
-            {loading ? "Processando..." : predictions.length > 0 ? "Concluído" : "Análise em Tempo Real"}
+            {loading ? "Processando..." : (predictions.length > 0 || countObjects !== null) ? "Concluído" : "Análise em Tempo Real"}
           </div>
         </div>
       </CardContent>

@@ -59,7 +59,7 @@ export default function RoboflowPage() {
                   width="100%"
                   height="720px"
                   frameBorder="0"
-                  allow="webcam; microphone; clipboard-write;"
+                  allow="camera; microphone; clipboard-write;"
                   className="w-full border-0"
                 />
               </div>
