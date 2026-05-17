@@ -3,13 +3,15 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
 
 export function SiteHeader() {
   const pathname = usePathname()
-  
+  const router = useRouter()
+
   // Função auxiliar para rolar suavemente se estivermos na home
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (pathname === "/") {
@@ -25,39 +27,50 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
+          {pathname !== "/" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.back()}
+              className="mr-2 flex items-center gap-1 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Voltar</span>
+            </Button>
+          )}
           {/* Logo ou Nome do Site */}
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
             {/* Se você tiver o logo, descomente a linha abaixo */}
             {/* <Image src="/images/labriot-logo.png" width={32} height={32} alt="Labriot" /> */}
-            <span>Labriot</span>
+            <span>LABRIOT</span>
           </Link>
         </div>
 
         {/* Menu Horizontal */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <Link 
-            href="/#projects" 
+          <Link
+            href="/#projects"
             onClick={(e) => scrollToSection(e, "projects")}
             className="transition-colors hover:text-primary text-muted-foreground"
           >
             Projetos
           </Link>
-          <Link 
-            href="/#team" 
+          <Link
+            href="/#team"
             onClick={(e) => scrollToSection(e, "team")}
             className="transition-colors hover:text-primary text-muted-foreground"
           >
             Equipe
           </Link>
-          <Link 
-            href="/#events" 
+          <Link
+            href="/#events"
             onClick={(e) => scrollToSection(e, "events")}
             className="transition-colors hover:text-primary text-muted-foreground"
           >
             Agenda de Eventos
           </Link>
-          <Link 
-            href="/#contact" 
+          <Link
+            href="/#contact"
             onClick={(e) => scrollToSection(e, "contact")}
             className="transition-colors hover:text-primary text-muted-foreground"
           >
@@ -70,7 +83,7 @@ export function SiteHeader() {
              <Link href="/admin/login">Área Admin</Link>
            </Button>
         </div> */}
-        
+
       </div>
     </header>
   )

@@ -16,6 +16,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const isLoginPage = pathname === '/admin/login';
 
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className={`sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background px-6 ${isLoginPage ? 'blur-sm' : ''}`}>

@@ -13,11 +13,11 @@ export async function GET(request: Request, context: { params: { id: string } })
 export async function PUT(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
   const data = await request.json();
-  const { title, description, status, startDate, endDate, image } = data;
+  const { title, description, status, startDate, endDate, image, url, fullDescription } = data;
 
   await db.run(
-    'UPDATE projects SET title = $1, description = $2, status = $3, startDate = $4, endDate = $5, image = $6 WHERE id = $7',
-    [title, description, status, startDate, endDate, image, context.params.id]
+    'UPDATE projects SET title = $1, description = $2, status = $3, startDate = $4, endDate = $5, image = $6, url = $7, "fullDescription" = $8 WHERE id = $9',
+    [title, description, status, startDate, endDate, image, url, fullDescription, context.params.id]
   );
 
   return NextResponse.json({ id: context.params.id, ...data });

@@ -37,6 +37,23 @@ export default function ProjectsPage() {
                   Explore nossas iniciativas de pesquisa inovadoras e inovações tecnológicas em robótica e IA.
                 </p>
               </div>
+              
+              <Card className="max-w-3xl w-full text-left bg-gradient-to-r from-muted/50 to-muted border-primary/20 shadow-md">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                    Demonstração de IA (Roboflow)
+                  </CardTitle>
+                  <CardDescription>
+                    Teste nosso modelo de visão computacional treinado para detectar objetos em tempo real.
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                  <Button asChild>
+                    <Link href="/projects/roboflow">Testar o Modelo Agora</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
             </div>
             <Tabs defaultValue="ongoing" className="mt-8 w-full max-w-4xl mx-auto">
               <TabsList className="grid w-full grid-cols-2">
@@ -67,7 +84,7 @@ export default function ProjectsPage() {
                       </CardContent>
                       <CardFooter>
                         <Button asChild>
-                          <Link href={`/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
+                          <Link href={project.url || `/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
                         </Button>
                       </CardFooter>
                     </Card>
@@ -98,7 +115,7 @@ export default function ProjectsPage() {
                       </CardContent>
                       <CardFooter>
                         <Button asChild>
-                          <Link href={`/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
+                          <Link href={project.url || `/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
                         </Button>
                       </CardFooter>
                     </Card>

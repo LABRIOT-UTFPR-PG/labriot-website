@@ -20,6 +20,7 @@ export default function EditProject({ params }: { params: { id: string } }) {
     description: '',
     fullDescription: '',
     image: '',
+    url: '',
   });
   const router = useRouter();
   const { id } = params;
@@ -35,8 +36,9 @@ export default function EditProject({ params }: { params: { id: string } }) {
             startDate: data.startDate || '',
             endDate: data.endDate || '',
             description: data.description || '',
-            fullDescription: data.fullDescription || '',
+            fullDescription: data.fullDescription || data.fulldescription || '',
             image: data.image || '',
+            url: data.url || '',
           });
         });
     }
@@ -135,6 +137,14 @@ export default function EditProject({ params }: { params: { id: string } }) {
             <div>
               <Label htmlFor="image">URL da Imagem</Label>
               <Input id="image" name="image" value={projectData.image} onChange={handleChange} placeholder="https://example.com/image.png" />
+            </div>
+
+            <div>
+              <Label htmlFor="url">Link / Página Customizada (Opcional)</Label>
+              <Input id="url" name="url" value={projectData.url} onChange={handleChange} placeholder="Ex: /projects/roboflow" />
+              <p className="text-xs text-muted-foreground">
+                Se você criou uma página específica para este projeto (ex: <code>/projects/roboflow</code>), insira o caminho aqui. Ao clicar no projeto na página inicial, o usuário será direcionado diretamente para ela.
+              </p>
             </div>
             
             <div className="flex gap-2">

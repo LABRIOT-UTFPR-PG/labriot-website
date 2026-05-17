@@ -15,10 +15,12 @@ import { toast } from "@/hooks/use-toast"
 export default function NewProject() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [fullDescription, setFullDescription] = useState('');
   const [status, setStatus] = useState('ongoing');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [image, setImage] = useState('');
+  const [url, setUrl] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +28,7 @@ export default function NewProject() {
     await fetch('/api/projects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, status, startDate, endDate, image }),
+      body: JSON.stringify({ title, description, fullDescription, status, startDate, endDate, image, url }),
     });
     toast({
       title: "Projeto salvo",
@@ -117,9 +119,29 @@ export default function NewProject() {
                 className="min-h-[100px]"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="fullDescription">Descrição Completa</Label>
+              <Textarea
+                id="fullDescription"
+                value={fullDescription}
+                onChange={(e) => setFullDescription(e.target.value)}
+                placeholder="Descrição detalhada do projeto para exibição na página de detalhes..."
+                className="min-h-[180px]"
+              />
+            </div>
+
             <div className="space-y-2">
                 <Label htmlFor="image">URL da Imagem</Label>
                 <Input id="image" value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://example.com/image.png" />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="url">Link / Página Customizada (Opcional)</Label>
+                <Input id="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Ex: /projects/roboflow" />
+                <p className="text-xs text-muted-foreground">
+                  Se você criou uma página específica para este projeto (ex: <code>/projects/roboflow</code>), insira o caminho aqui. Ao clicar no projeto na página inicial, o usuário será direcionado diretamente para ela.
+                </p>
             </div>
           </form>
         </CardContent>

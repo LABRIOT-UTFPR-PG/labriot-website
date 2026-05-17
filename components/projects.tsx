@@ -56,7 +56,7 @@ export default function Projects() {
               </CardContent>
               <CardFooter>
                 <Button asChild>
-                  <Link href={`/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
+                  <Link href={project.url || `/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
                 </Button>
               </CardFooter>
             </Card>
@@ -88,7 +88,7 @@ export default function Projects() {
               </CardContent>
               <CardFooter>
                 <Button asChild>
-                  <Link href={`/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
+                  <Link href={project.url || `/projects/${project.id}`}>Ver Detalhes do Projeto</Link>
                 </Button>
               </CardFooter>
             </Card>
