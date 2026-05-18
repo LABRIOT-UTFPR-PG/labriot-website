@@ -9,37 +9,14 @@ import UpcomingEvents from "@/components/upcoming-events"
 import ResearchHighlights from "@/components/research-highlights"
 import TeamMembers from "@/components/team-members"
 import Projects from "@/components/projects"
+import { HeroCarousel } from "@/components/hero-carousel"
 export default function Home() {
   return (
     <>
       {/* Seção 1: Hero / Preto */}
       <section className="w-full py-8 md:py-16 lg:py-20 xl:py-24 bg-background">
-        <div className="container px-4 md:px-6">
-          <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-            <div className="flex flex-col justify-center space-y-4">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                  Avançando no Futuro da Robótica e IA
-                </h1>
-                <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  Labriot é um laboratório de pesquisa dedicado a avançar as fronteiras da robótica e
-                  inteligência artificial através de pesquisa e desenvolvimento inovadores.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/contact">Contate-nos</Link>
-                </Button>
-              </div>
-            </div>
-            <Image
-              src="/images/labriot-logo.png" 
-              width={550}
-              height={550}
-              alt="Logo Labriot"
-              className="mx-auto aspect-square overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
-            />
-          </div>
+        <div className="container px-4 md:px-6 relative">
+          <HeroCarousel />
         </div>
       </section>
       
