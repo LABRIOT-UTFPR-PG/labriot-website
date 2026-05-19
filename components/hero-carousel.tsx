@@ -30,7 +30,7 @@ export function HeroCarousel() {
       title: "IA para Todos",
       description: "Em colaboração com a Multicortex. Democratizando o acesso à inteligência artificial.",
       image: "/images/ia.avif",
-      url: "https://github.com/ItamarIliuk/ia-para-todos",
+      url: "https://itamariliuk.github.io/ia-para-todos/",
       buttonText: "Ver Projeto",
       contain: false
     }
@@ -41,7 +41,7 @@ export function HeroCarousel() {
   )
 
   return (
-    <Carousel 
+    <Carousel
       plugins={[plugin.current]}
       className="w-full"
       onMouseEnter={plugin.current.stop}
