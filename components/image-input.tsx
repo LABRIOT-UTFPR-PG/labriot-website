@@ -36,12 +36,13 @@ export function ImageInput({ value, onChange }: ImageInputProps) {
           onChange(data.url);
         }
       } else {
-        console.error('Upload failed');
-        alert('Falha ao fazer upload da imagem.');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Upload failed:', errorData);
+        alert(`Falha ao fazer upload da imagem: ${errorData.error || 'Erro desconhecido'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      alert('Erro ao fazer upload da imagem.');
+      alert(`Erro ao fazer upload da imagem: ${error.message || 'Erro desconhecido'}`);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
