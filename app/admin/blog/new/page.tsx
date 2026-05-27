@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { ImageInput } from "@/components/image-input"
 
 export default function NewBlogPost() {
   const [title, setTitle] = useState('');
@@ -110,8 +111,7 @@ export default function NewBlogPost() {
               />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="image">URL da Imagem</Label>
-                <Input id="image" value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://example.com/image.png" />
+                <ImageInput value={image} onChange={setImage} />
             </div>
           </form>
         </CardContent>
