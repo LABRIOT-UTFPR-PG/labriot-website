@@ -33,7 +33,7 @@ export default function Projects() {
       </TabsList>
 
       <TabsContent value="ongoing" className="mt-6">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {ongoingProjects.map((project) => (
             <Card key={project.id}>
               <CardHeader>
@@ -77,7 +77,7 @@ export default function Projects() {
       </TabsContent>
 
       <TabsContent value="completed" className="mt-6">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {completedProjects.map((project) => (
             <Card key={project.id}>
               <CardHeader>

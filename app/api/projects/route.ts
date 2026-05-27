@@ -3,7 +3,7 @@ import { openDb } from '@/lib/db';
 
 export async function GET() {
   const db = await openDb();
-  const projects = await db.all('SELECT * FROM projects');
+  const projects = await db.all('SELECT id, title, description, status, startdate AS "startDate", enddate AS "endDate", image, url, "fullDescription" FROM projects');
   return NextResponse.json(projects);
 }
 

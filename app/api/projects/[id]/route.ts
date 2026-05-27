@@ -3,7 +3,7 @@ import { openDb } from '@/lib/db';
 
 export async function GET(request: Request, context: { params: { id: string } }) {
   const db = await openDb();
-  const project = await db.get('SELECT * FROM projects WHERE id = $1', [context.params.id]);
+  const project = await db.get('SELECT id, title, description, status, startdate AS "startDate", enddate AS "endDate", image, url, "fullDescription" FROM projects WHERE id = $1', [context.params.id]);
   if (!project) {
     return new Response('Projeto não encontrado', { status: 404 });
   }

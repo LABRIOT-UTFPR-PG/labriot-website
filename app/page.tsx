@@ -106,7 +106,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mt-8 w-full max-w-4xl mx-auto">
+          <div className="mt-8 w-full max-w-6xl mx-auto px-4 md:px-6">
             <Projects />
           </div>
           <div className="flex justify-center mt-12">

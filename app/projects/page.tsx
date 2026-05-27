@@ -55,13 +55,13 @@ export default function ProjectsPage() {
                 </CardFooter>
               </Card>
             </div>
-            <Tabs defaultValue="ongoing" className="mt-8 w-full max-w-4xl mx-auto">
+            <Tabs defaultValue="ongoing" className="mt-8 w-full max-w-6xl mx-auto px-4 md:px-6">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="ongoing">Projetos em Andamento</TabsTrigger>
                 <TabsTrigger value="completed">Projetos Concluídos</TabsTrigger>
               </TabsList>
               <TabsContent value="ongoing" className="mt-6">
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {ongoingProjects.map(project => (
                     <Card key={project.id}>
                       <CardHeader>
@@ -104,7 +104,7 @@ export default function ProjectsPage() {
                 </div>
             </TabsContent>
               <TabsContent value="completed" className="mt-6">
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {completedProjects.map(project => (
                     <Card key={project.id}>
                       <CardHeader>
