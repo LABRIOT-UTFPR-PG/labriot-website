@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { UploadCloud, Image as ImageIcon, Loader2 } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { UploadCloud, Image as ImageIcon, Loader2, Camera, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -23,6 +23,61 @@ export function RoboflowUploader() {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const streamRef = useRef<MediaStream | null>(null);
+  const liveVideoRef = useRef<HTMLVideoElement>(null);
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setIsCameraOpen(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+      streamRef.current = stream;
+      if (liveVideoRef.current) {
+        liveVideoRef.current.srcObject = stream;
+      }
+      setIsCameraOpen(true);
+      setSelectedImage(null);
+      setAnnotatedImage(null);
+      setPredictions([]);
+      setCountObjects(null);
+    } catch (err: any) {
+      toast.error("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
+    }
+  };
+
+  const capturePhoto = () => {
+    if (!liveVideoRef.current) return;
+    
+    const video = liveVideoRef.current;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const base64 = canvas.toDataURL("image/jpeg", 0.9);
+    
+    stopCamera();
+    setSelectedImage(base64);
+    processImage(base64);
+  };
 
   const drawPredictions = (preds: Prediction[]) => {
     const canvas = canvasRef.current;
@@ -52,22 +107,34 @@ export function RoboflowUploader() {
       const w = pred.width * scaleX;
       const h = pred.height * scaleY;
 
+      // Margem para afastar a caixa do objeto (identificação mais distante)
+      const padding = 15;
+      const drawX = Math.max(0, x - padding);
+      const drawY = Math.max(0, y - padding);
+      const drawW = Math.min(canvas.width - drawX, w + padding * 2);
+      const drawH = Math.min(canvas.height - drawY, h + padding * 2);
+
       // Draw box
       ctx.strokeStyle = "#00FF00"; // Green bounding box
       ctx.lineWidth = 3;
-      ctx.strokeRect(x, y, w, h);
+      ctx.strokeRect(drawX, drawY, drawW, drawH);
 
-      // Draw background for text
+      // Draw background for text at the BOTTOM
       const text = `${pred.class} (${(pred.confidence * 100).toFixed(1)}%)`;
       ctx.font = "16px sans-serif";
       const textWidth = ctx.measureText(text).width;
       
+      // Evita cortar texto na direita
+      const labelX = Math.min(drawX, canvas.width - textWidth - 8);
+      // Evita cortar texto caso a caixa chegue até o final do canvas em baixo
+      const labelY = (drawY + drawH + 24 > canvas.height) ? drawY + drawH - 24 : drawY + drawH;
+      
       ctx.fillStyle = "#00FF00";
-      ctx.fillRect(x, y - 24, textWidth + 8, 24);
+      ctx.fillRect(labelX, labelY, textWidth + 8, 24);
 
       // Draw text
       ctx.fillStyle = "#000000";
-      ctx.fillText(text, x + 4, y - 8);
+      ctx.fillText(text, labelX + 4, labelY + 16);
     });
   };
 
@@ -144,26 +211,56 @@ export function RoboflowUploader() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center justify-center w-full">
-          <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 border-muted-foreground/30 hover:bg-muted/80 transition-colors">
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              <ImageIcon className="w-10 h-10 mb-3 text-muted-foreground" />
-              <p className="mb-2 text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">Clique para enviar</span> ou arraste uma imagem
-              </p>
-              <p className="text-xs text-muted-foreground">JPEG, PNG ou WEBP (Max 5MB)</p>
+        {!isCameraOpen ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 border-muted-foreground/30 hover:bg-muted/80 transition-colors">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <ImageIcon className="w-10 h-10 mb-3 text-muted-foreground" />
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">Clique para enviar</span> ou arraste uma imagem
+                  </p>
+                  <p className="text-xs text-muted-foreground">JPEG, PNG ou WEBP (Max 5MB)</p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={loading}
+                />
+              </label>
             </div>
-            <input
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={handleImageUpload}
-              disabled={loading}
-            />
-          </label>
-        </div>
+            <div className="flex justify-center">
+              <Button onClick={startCamera} variant="secondary" className="w-full sm:w-auto" disabled={loading}>
+                <Camera className="w-4 h-4 mr-2" />
+                Tirar Foto com a Câmera
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="relative border rounded-lg overflow-hidden bg-black flex justify-center items-center h-auto min-h-[300px]">
+              <video
+                ref={liveVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className="max-h-[500px] w-full object-contain"
+              />
+            </div>
+            <div className="flex justify-center gap-4">
+              <Button onClick={capturePhoto} className="flex-1 sm:flex-none">
+                <Camera className="w-4 h-4 mr-2" /> Capturar
+              </Button>
+              <Button onClick={stopCamera} variant="destructive" className="flex-1 sm:flex-none">
+                <X className="w-4 h-4 mr-2" /> Cancelar
+              </Button>
+            </div>
+          </div>
+        )}
 
-        {selectedImage && (
+        {!isCameraOpen && selectedImage && (
           <div className="relative border rounded-lg overflow-hidden bg-black/5 flex justify-center items-center">
             {/* Imagem de Fundo (Ou a anotada da IA se houver) */}
             <img
@@ -185,6 +282,16 @@ export function RoboflowUploader() {
                 style={{ pointerEvents: "none" }}
               />
             )}
+          </div>
+        )}
+
+        {!isCameraOpen && predictions.length > 0 && (
+          <div className="flex flex-wrap gap-2 justify-center pt-2">
+            {predictions.map((pred, index) => (
+              <div key={index} className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full border border-primary/20">
+                {pred.class} ({(pred.confidence * 100).toFixed(1)}%)
+              </div>
+            ))}
           </div>
         )}
 
