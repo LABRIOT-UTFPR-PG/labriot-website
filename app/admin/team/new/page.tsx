@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ImageInput } from '@/components/image-input';
 
 export default function NewTeamMember() {
   const [name, setName] = useState('');
@@ -62,7 +61,8 @@ export default function NewTeamMember() {
                         />
                     </div>
                     <div>
-                        <ImageInput value={image} onChange={setImage} />
+                        <Label htmlFor="image">URL da Imagem</Label>
+                        <Input id="image" value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://example.com/image.png" />
                     </div>
                     <Button type="submit">Adicionar Membro</Button>
                 </form>

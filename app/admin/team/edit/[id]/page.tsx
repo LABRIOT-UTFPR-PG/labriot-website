@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ImageInput } from '@/components/image-input';
 
 export default function EditTeamMember({ params }: { params: Promise<{ id: string }> }) {
   const [id, setId] = useState<string | null>(null);
@@ -96,7 +95,8 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
                         />
                     </div>
                     <div>
-                        <ImageInput value={image} onChange={setImage} />
+                        <Label htmlFor="image">URL da Imagem</Label>
+                        <Input id="image" value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://example.com/image.png" />
                     </div>
                     <Button type="submit">Salvar Alterações</Button>
                 </form>

@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { ImageInput } from "@/components/image-input"
 
 export default function NewProject() {
   const [title, setTitle] = useState('');
@@ -133,7 +132,8 @@ export default function NewProject() {
             </div>
 
             <div className="space-y-2">
-                <ImageInput value={image} onChange={setImage} />
+                <Label htmlFor="image">URL da Imagem</Label>
+                <Input id="image" value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://example.com/image.png" />
             </div>
 
             <div className="space-y-2">

@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
-import { ImageInput } from '@/components/image-input';
 
 export default function EditProject({ params }: { params: { id: string } }) {
   const [projectData, setProjectData] = useState({
@@ -136,7 +135,8 @@ export default function EditProject({ params }: { params: { id: string } }) {
             </div>
 
             <div>
-              <ImageInput value={projectData.image} onChange={(url) => setProjectData(prev => ({ ...prev, image: url }))} />
+              <Label htmlFor="image">URL da Imagem</Label>
+              <Input id="image" name="image" value={projectData.image} onChange={handleChange} placeholder="https://example.com/image.png" />
             </div>
 
             <div>

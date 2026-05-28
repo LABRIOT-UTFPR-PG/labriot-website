@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { ImageInput } from '@/components/image-input';
 
 export default function EditPost({ params }: { params: { id: string } }) {
   const [postData, setPostData] = useState({
@@ -97,7 +96,8 @@ export default function EditPost({ params }: { params: { id: string } }) {
               <Textarea id="content" name="content" value={postData.content} onChange={handleChange} className="min-h-[200px]" required />
             </div>
             <div>
-              <ImageInput value={postData.image} onChange={(url) => setPostData(prev => ({ ...prev, image: url }))} />
+              <Label htmlFor="image">URL da Imagem</Label>
+              <Input id="image" name="image" value={postData.image} onChange={handleChange} placeholder="https://example.com/image.png" />
             </div>
             <div className="flex gap-2">
                 <Button type="submit">Salvar Alterações</Button>
