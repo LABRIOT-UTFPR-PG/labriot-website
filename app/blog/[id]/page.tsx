@@ -1,52 +1,13 @@
-"use client"
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { getSafeImageSrc } from '@/lib/media';
 import { ArrowLeft } from 'lucide-react';
-
-interface Post {
-  id: number;
-  title: string;
-  author: string;
-  date: string;
-  content: string;
-  image?: string;
-}
-
-export default function PostPage({ params }: { params: { id: string } }) {
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { id } = params;
-
-  useEffect(() => {
-    if (id) {
-      fetch(`/api/posts/${id}`)
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          }
-          throw new Error('Post not found');
-        })
-        .then(data => {
-          setPost(data);
-        })
-        .catch(error => {
-          console.error("Failed to fetch post:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [id]);
-
-  if (loading) {
-    return (
-        <div className="container mx-auto px-4 py-12 text-center">
-            <p>Carregando post...</p>
-        </div>
-    );
-  }
+import { getPublicPostById } from '@/lib/public-data';
+ 
+export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const post = await getPublicPostById(id);
 
   if (!post) {
      return (
@@ -69,30 +30,22 @@ export default function PostPage({ params }: { params: { id: string } }) {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="mx-auto max-w-3xl">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.history.length > 1) {
-                      window.history.back();
-                    } else {
-                      window.location.href = "/blog";
-                    }
-                  }}
-                  className="mb-8 flex items-center gap-2"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Voltar para o Blog
+                <Button asChild variant="outline" className="mb-8 flex items-center gap-2">
+                  <Link href="/blog">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Voltar para o Blog
+                  </Link>
                 </Button>
               <article>
                 <header className="mb-8 border-b pb-4">
                   <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{post.title}</h1>
                   <p className="mt-3 text-lg text-muted-foreground">
-                    Por {post.author} em {new Date(post.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    Por {post.author || "Autor nao informado"} em {post.date ? new Date(post.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' }) : "data nao informada"}
                   </p>
                 </header>
                 {post.image && (
                   <div className="relative aspect-video w-full mb-8 overflow-hidden rounded-lg">
-                    <Image src={post.image} alt={post.title} layout="fill" objectFit="cover" />
+                    <Image src={getSafeImageSrc(post.image)} alt={post.title} fill className="object-cover" />
                   </div>
                 )}
                 {/* Usamos 'whitespace-pre-wrap' para renderizar as quebras de linha do banco de dados */}

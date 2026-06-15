@@ -5,13 +5,14 @@ import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-export default function DeleteMemberButton({ id }: { id: number }) {
+export default function DeleteMemberButton({ id }: { id: number | string }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (confirm('Tem certeza que deseja excluir este membro?')) {
       setIsDeleting(true);
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       await fetch(`/api/team/${id}`, { method: 'DELETE' });
       router.refresh(); // Atualiza a página com os novos dados do servidor
     }

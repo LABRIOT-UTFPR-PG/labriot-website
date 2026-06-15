@@ -10,7 +10,7 @@ import { useEffect, useState } from "react"
 
 // Definição da interface baseada na tabela criada
 interface Event {
-  id: number;
+  id: string;
   title: string;
   description: string;
   date: string;
@@ -25,6 +25,7 @@ export default function EventsAdmin() {
 
   // Busca os dados da API
   useEffect(() => {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
     fetch('/api/events')
       .then(res => res.json())
       .then(data => {
@@ -37,12 +38,17 @@ export default function EventsAdmin() {
       });
   }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este evento?')) {
-      // Nota: Você precisará criar a rota DELETE em /api/events/[id]/route.ts se quiser que funcione
-      // await fetch(`/api/events/${id}`, { method: 'DELETE' });
-      // setEvents(events.filter(e => e.id !== id));
-      alert("Funcionalidade de deletar precisa da rota API implementada.");
+      const response = await fetch(`/api/events/${id}`, { method: 'DELETE' });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        alert(payload?.message || "Nao foi possivel excluir o evento.");
+        return;
+      }
+
+      setEvents(events.filter(e => e.id !== id));
     }
   };
 

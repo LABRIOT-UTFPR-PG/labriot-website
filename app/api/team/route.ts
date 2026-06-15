@@ -1,25 +1,73 @@
-import { NextResponse } from 'next/server';
-import { openDb } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { recordAdminAudit } from "@/lib/audit";
+import { databaseUnavailableResponse, isDatabaseConfigured } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
+import { getTeamRepository } from "@/lib/repositories/team";
+import { getCurrentAdminActor } from "@/lib/server-admin-session";
+import { enforceRequestRateLimit } from "@/lib/request-security";
+import { formatZodErrors, teamPayloadSchema } from "@/lib/validations/team";
 
 export async function GET() {
-  const db = await openDb();
-  const team = await db.all('SELECT * FROM team');
+  const team = await getTeamRepository().list();
   return NextResponse.json(team);
 }
 
 export async function POST(request: Request) {
-  const db = await openDb();
-  const data = await request.json();
-  const { name, specialization, image, linkedin, category } = data;
+  if (!isDatabaseConfigured()) {
+    return databaseUnavailableResponse();
+  }
 
-  const role = "Pesquisador";
-  // Se não enviarem, manter um fallback
-  const finalCategory = category || "students";
+  const actor = await getCurrentAdminActor();
 
-  const result = await db.run(
-    'INSERT INTO team (name, role, specialization, category, image, linkedin) VALUES ($1, $2, $3, $4, $5, $6)',
-    [name, role, specialization, finalCategory, image, linkedin]
-  );
+  if (!actor) {
+    return NextResponse.json({ message: "Autenticacao de administrador obrigatoria." }, { status: 401 });
+  }
 
-  return NextResponse.json({ id: result.lastID, ...data, role, category: finalCategory });
+  const rateLimit = enforceRequestRateLimit({
+    scope: "team:create",
+    request,
+    ipRule: {
+      limit: 120,
+      windowMs: 15 * 60 * 1000,
+    },
+    identityRule: {
+      limit: 60,
+      windowMs: 15 * 60 * 1000,
+    },
+    identityKey: actor.userId,
+    message: "Muitas alteracoes de membros da equipe. Tente novamente mais tarde.",
+  });
+
+  if (rateLimit) {
+    return rateLimit;
+  }
+
+  const payload = await request.json();
+  const validation = teamPayloadSchema.safeParse(payload);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      {
+        message: "Dados invalidos.",
+        errors: formatZodErrors(validation.error),
+      },
+      { status: 400 }
+    );
+  }
+
+  const member = await getTeamRepository().create({
+    ...validation.data,
+    role: validation.data.role ?? "Pesquisador",
+  });
+  await recordAdminAudit({
+    actor,
+    action: "create",
+    resourceType: "team_member",
+    resourceId: String(member.id),
+    resourceLabel: member.name,
+    summary: `Criou o membro de equipe ${member.name}.`,
+    ip: getClientIp(request),
+  });
+
+  return NextResponse.json(member, { status: 201 });
 }

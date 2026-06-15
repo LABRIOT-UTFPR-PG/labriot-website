@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import type { ChangeEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,30 +11,54 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Save, Upload } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { getApiErrorMessage } from "@/lib/form-errors"
+import { createDefaultSiteSettings, type SiteSettings } from "@/lib/site-settings"
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState({
-    siteName: "Labriot",
-    siteDescription: "Laboratório de Pesquisa em Robótica e Inteligência Artificial",
-    contactEmail: "info@labriot.com",
-    contactPhone: "+55 (11) 5555-0123",
-    contactAddress: "Rua da Inovação, 123, São Paulo, SP 04107",
-    socialMedia: {
-      twitter: "https://twitter.com/labriot",
-      linkedin: "https://linkedin.com/company/labriot",
-      github: "https://github.com/labriot",
-    },
-    enableBlog: true,
-    enableEvents: true,
-    enableNewsletter: true,
-  })
+  const [settings, setSettings] = useState<SiteSettings>(() => createDefaultSiteSettings())
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    void loadSettings()
+  }, [])
+
+  async function loadSettings() {
+    setLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch("/api/settings")
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(getApiErrorMessage(payload, "Nao foi possivel carregar as configuracoes."))
+      }
+
+      setSettings({
+        ...createDefaultSiteSettings(),
+        ...payload,
+        socialMedia: {
+          ...createDefaultSiteSettings().socialMedia,
+          ...payload?.socialMedia,
+        },
+      })
+    } catch (fetchError) {
+      setError(
+        fetchError instanceof Error ? fetchError.message : "Nao foi possivel carregar as configuracoes."
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setSettings((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSocialMediaChange = (platform, value) => {
+  const handleSocialMediaChange = (platform: keyof typeof settings.socialMedia, value: string) => {
     setSettings((prev) => ({
       ...prev,
       socialMedia: {
@@ -43,27 +68,67 @@ export default function SettingsPage() {
     }))
   }
 
-  const handleToggleChange = (name, checked) => {
+  const handleToggleChange = (
+    name: "enableBlog" | "enableEvents" | "enableNewsletter",
+    checked: boolean
+  ) => {
     setSettings((prev) => ({ ...prev, [name]: checked }))
   }
 
-  const handleSave = () => {
-    console.log("Configurações salvas:", settings)
+  const handleUploadPlaceholder = () => {
     toast({
-      title: "Configurações salvas",
-      description: "As configurações do site foram atualizadas com sucesso.",
+      title: "Upload ainda nao implementado",
+      description: "Por enquanto, logo e favicon permanecem como placeholders visuais.",
     })
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    setError("")
+
+    try {
+      const response = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      })
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(getApiErrorMessage(payload, "Nao foi possivel salvar as configuracoes."))
+      }
+
+      setSettings(payload)
+      toast({
+        title: "Configuracoes salvas",
+        description: "As configuracoes do site foram atualizadas com sucesso.",
+      })
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error ? saveError.message : "Nao foi possivel salvar as configuracoes."
+      setError(message)
+      toast({
+        title: "Erro ao salvar",
+        description: message,
+        variant: "destructive",
+      })
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Configurações do Site</h1>
-        <Button onClick={handleSave}>
+        <Button onClick={() => void handleSave()} disabled={loading || saving}>
           <Save className="mr-2 h-4 w-4" />
-          Salvar Configurações
+          {saving ? "Salvando..." : "Salvar Configurações"}
         </Button>
       </div>
+
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      {loading ? <p className="text-sm text-muted-foreground">Carregando configuracoes...</p> : null}
 
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
@@ -98,29 +163,29 @@ export default function SettingsPage() {
 
               <div className="space-y-2">
                 <Label>Logo do Site</Label>
-                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 rounded-md bg-muted flex items-center justify-center">
-                    <span className="text-2xl font-bold">L</span>
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-md bg-muted flex items-center justify-center">
+                      <span className="text-2xl font-bold">L</span>
+                    </div>
+                    <Button variant="outline" size="sm" type="button" onClick={handleUploadPlaceholder}>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Alterar Logo
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Alterar Logo
-                  </Button>
                 </div>
-              </div>
 
               <div className="space-y-2">
                 <Label>Favicon</Label>
-                <div className="flex items-center gap-4">
-                  <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
-                    <span className="text-xs font-bold">L</span>
+                  <div className="flex items-center gap-4">
+                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
+                      <span className="text-xs font-bold">L</span>
+                    </div>
+                    <Button variant="outline" size="sm" type="button" onClick={handleUploadPlaceholder}>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Alterar Favicon
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Alterar Favicon
-                  </Button>
                 </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -241,12 +306,11 @@ export default function SettingsPage() {
       </Tabs>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave}>
+        <Button onClick={() => void handleSave()} disabled={loading || saving}>
           <Save className="mr-2 h-4 w-4" />
-          Salvar Configurações
+          {saving ? "Salvando..." : "Salvar Configurações"}
         </Button>
       </div>
     </div>
   )
 }
-

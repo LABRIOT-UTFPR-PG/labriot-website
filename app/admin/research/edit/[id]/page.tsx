@@ -10,17 +10,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { getApiErrorMessage } from '@/lib/form-errors';
 
-export default function EditResearch({ params }: { params: { id: string } }) {
+export default function EditResearch({ params }: { params: Promise<{ id: string }> }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const router = useRouter();
-  const { id } = params;
+  const [id, setId] = useState("");
+
+  useEffect(() => {
+    params.then(({ id }) => setId(id));
+  }, [params]);
 
   useEffect(() => {
     if (id) {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       fetch(`/api/research/${id}`)
-        .then(res => res.json())
+        .then(async res => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Falha ao carregar pesquisa");
+          return data;
+        })
         .then(data => {
           setTitle(data.title);
           setDescription(data.description);
@@ -30,11 +40,23 @@ export default function EditResearch({ params }: { params: { id: string } }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch(`/api/research/${id}`, {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch(`/api/research/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, description }),
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      toast({
+        title: "Nao foi possivel salvar",
+        description: getApiErrorMessage(payload, "Verifique os campos e tente novamente."),
+        variant: "destructive",
+      });
+      return;
+    }
+
     toast({
       title: "Área de pesquisa atualizada",
       description: "A área de pesquisa foi atualizada com sucesso.",

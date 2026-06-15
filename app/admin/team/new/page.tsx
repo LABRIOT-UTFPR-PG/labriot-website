@@ -6,22 +6,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getApiErrorMessage } from '@/lib/form-errors';
 
 export default function NewTeamMember() {
   const [name, setName] = useState('');
   const [specialization, setSpecialization] = useState('');
-  const [category, setCategory] = useState('Equipe'); // Novo estado para o grupo/setor
+  const [category, setCategory] = useState('');
   const [image, setImage] = useState('');
-  const [linkedin, setLinkedin] = useState(''); // Novo estado
+  const [linkedin, setLinkedin] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/team', {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch('/api/team', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, specialization, image, linkedin, category }), // Enviando category
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      alert(getApiErrorMessage(payload, 'Não foi possível salvar o membro.'));
+      return;
+    }
+
     router.push('/admin/team');
   };
 
@@ -43,12 +52,12 @@ export default function NewTeamMember() {
                     </div>
                     <div>
                         <Label htmlFor="category">Setor / Grupo</Label>
-                        <Input 
-                          id="category" 
-                          value={category} 
-                          onChange={(e) => setCategory(e.target.value)} 
-                          placeholder="Ex: Professores, Liderança, Alunos de Mestrado" 
-                          required 
+                        <Input
+                          id="category"
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          placeholder="Ex: Hardware e Financeiro"
+                          required
                         />
                     </div>
                     <div>

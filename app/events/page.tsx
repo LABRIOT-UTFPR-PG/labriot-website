@@ -1,37 +1,18 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MapPin, Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { getPublicEvents, getPublicSiteSettings } from "@/lib/public-data"
+import { notFound } from "next/navigation"
+import type { EventRecord } from "@/lib/repositories/events"
 
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  status?: string;
-}
+export default async function EventsPage() {
+  const settings = await getPublicSiteSettings()
 
-export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
+  if (!settings.enableEvents) {
+    notFound()
+  }
 
-  useEffect(() => {
-    fetch('/api/events')
-      .then(res => res.json())
-      .then(data => {
-        setEvents(data);
-        setLoading(false);
-      })
-      .catch(err => setLoading(false));
-  }, []);
-
-  if (loading) return <div className="container py-24 text-center">Carregando eventos...</div>;
+  const events = await getPublicEvents() as EventRecord[]
 
   return (
     <div className="flex flex-col min-h-screen">

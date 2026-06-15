@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  adminUserId   String   @db.ObjectId
+  adminUsername String
+  action        String
+  resourceType  String
+  resourceId    String?
+  resourceLabel String?
+  summary       String
+  ip            String?
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([adminUserId, createdAt])
+}
+
+model TeamMember {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  role           String   @default("Pesquisador")
+  specialization String?
+  category       String   @default("students")
+  image          String?
+  linkedin       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model AttendanceSession {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  date      String
+  summary   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+  @@index([createdAt])
+}
+
+model AttendanceRecord {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId  String   @db.ObjectId
+  memberId   String   @db.ObjectId
+  memberName String
+  memberRole String?
+  present    Boolean  @default(false)
+  active     Boolean  @default(true)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([sessionId, memberId])
+  @@index([sessionId])
+  @@index([memberId])
+}
+
+model Project {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  description     String?
+  status          String   @default("ongoing")
+  startDate       String?
+  endDate         String?
+  image           String?
+  url             String?
+  fullDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Research {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Publication {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  authors     String
+  journal     String?
+  year        Int
+  doi         String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Post {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  summary   String?
+  content   String?
+  author    String?
+  date      String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  date        String
+  time        String?
+  location    String?
+  status      String   @default("Proximo")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String
+  organization String?
+  inquiryType  String?
+  interest     String?
+  message      String
+  createdAt    DateTime @default(now())
+}
+
+model SiteSettings {
+  id               String   @id @map("_id")
+  siteName         String
+  siteDescription  String
+  contactEmail     String
+  contactPhone     String
+  contactAddress   String
+  socialTwitter    String
+  socialLinkedin   String
+  socialGithub     String
+  enableBlog       Boolean  @default(true)
+  enableEvents     Boolean  @default(true)
+  enableNewsletter Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

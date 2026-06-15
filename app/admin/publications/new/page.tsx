@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getApiErrorMessage } from '@/lib/form-errors';
 import { ArrowLeft } from 'lucide-react';
 
 export default function NewPublication() {
@@ -21,11 +22,19 @@ export default function NewPublication() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/publications', {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch('/api/publications', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, authors, journal, year, doi, description }),
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      alert(getApiErrorMessage(payload, 'Nao foi possivel salvar a publicacao.'));
+      return;
+    }
+
     router.push('/admin/publications');
   };
 

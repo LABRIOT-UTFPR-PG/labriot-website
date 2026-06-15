@@ -1,186 +1,165 @@
 /* app/page.tsx */
 import Link from "next/link"
-import Image from "next/image"
-import { ArrowRight, Brain, ChevronRight, Cpu } from "lucide-react"
+import { ArrowRight, Bot, Brain, Cpu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import UpcomingEvents from "@/components/upcoming-events"
-import ResearchHighlights from "@/components/research-highlights"
 import TeamMembers from "@/components/team-members"
 import Projects from "@/components/projects"
 import { HeroCarousel } from "@/components/hero-carousel"
-export default function Home() {
+import { getPublicSiteSettings } from "@/lib/public-data"
+
+export default async function Home() {
+  const settings = await getPublicSiteSettings()
+  const missionCards = [
+    {
+      title: "Robótica",
+      description:
+        "Desenvolvimento de sistemas robóticos inteligentes e soluções de IoT para resolver problemas complexos com alta precisão.",
+      icon: Bot,
+    },
+    {
+      title: "Inteligência Artificial",
+      description:
+        "Implementação de algoritmos de inteligência artificial e modelos de aprendizado de máquina para otimizar a tomada de decisão com assertividade estratégica.",
+      icon: Brain,
+    },
+    {
+      title: "Agentes Inteligentes",
+      description:
+        "Criação de agentes inteligentes e desenvolvimento de LLMs para automatizar tarefas com alta adaptabilidade.",
+      icon: Cpu,
+    },
+  ]
+
   return (
-    <>
+    <div className="landing-flow bg-background">
       {/* Seção 1: Hero / Preto */}
-      <section className="w-full py-8 md:py-16 lg:py-20 xl:py-24 bg-background">
-        <div className="container px-4 md:px-6 relative">
+      <section className="landing-section w-full py-8 md:py-14 lg:py-20">
+        <div className="container relative px-4 md:px-6" data-scroll-reveal>
           <HeroCarousel />
         </div>
       </section>
       
       {/* Seção 2: Missão / Cinza */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-background-1000">
+      <section className="landing-section w-full py-[var(--section-y-sm)]">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <div className="inline-block rounded-lg bg-primary px-3 py-1 text-sm text-primary-foreground">
-                Nossa Missão
-              </div>
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                Avançando a Tecnologia para um Amanhã Melhor
-              </h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                No Labriot, estamos comprometidos em desenvolver sistemas robóticos inteligentes e algoritmos de IA que
-                resolvam problemas do mundo real e melhorem a vida humana. Nossa abordagem interdisciplinar combina
-                pesquisa de ponta com aplicações práticas.
-              </p>
+          <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 text-center" data-scroll-reveal>
+            <div className="section-kicker">
+              Nossa Missão
             </div>
+            <h2 className="font-display text-3xl font-semibold tracking-[-0.04em] md:text-5xl">
+              Avançando a Tecnologia para um Amanhã Melhor
+            </h2>
+            <p className="text-base leading-8 text-muted-foreground md:text-xl">
+              No Labriot, estamos comprometidos em desenvolver sistemas robóticos inteligentes e algoritmos de IA que
+              resolvam problemas do mundo real e melhorem a vida humana. Nossa abordagem interdisciplinar combina
+              pesquisa de ponta com aplicações práticas.
+            </p>
           </div>
-          <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3">
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="h-12 w-12 text-primary mb-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 8V4H8" />
-                    <rect width="16" height="12" x="4" y="8" rx="2" />
-                    <path d="M2 14h2" />
-                    <path d="M20 14h2" />
-                    <path d="M15 13v2" />
-                    <path d="M9 13v2" />
-                  </svg>
-                </div>
-                <CardTitle>Robótica</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Desenvolvimento de sistemas robóticos inteligentes e soluções de IoT para resolver problemas complexos com alta precisão. 
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <Brain className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>Inteligência Artifical</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Implementação de algoritmos de inteligência artificial e modelos de aprendizado de máquina para otimizar a tomada de decisão com assertividade estratégica.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <Cpu className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>Agentes Inteligentes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Criação de agentes inteligentes e desenvolvimento de LLMs para automatizar tarefas com alta adaptabilidade.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="mx-auto grid max-w-6xl items-stretch gap-6 pt-12 lg:grid-cols-3">
+            {missionCards.map(({ title, description, icon: Icon }, index) => (
+              <Card key={title} className="premium-card group flex min-h-[280px] flex-col justify-between !border-0 !bg-transparent !shadow-none md:min-h-[325px]" data-scroll-reveal>
+                <CardHeader className="gap-10 p-8 pb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="forrm-number">{String(index + 1).padStart(2, "0")}</span>
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border/50 bg-background/45 text-muted-foreground shadow-[var(--shadow-soft)] transition-transform duration-300 group-hover:scale-105 group-hover:text-foreground">
+                    <Icon className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <CardTitle className="font-display text-2xl tracking-[-0.055em] md:text-3xl">{title}</CardTitle>
+                </CardHeader>
+                <CardContent className="px-8 pb-8">
+                  <p className="max-w-[18rem] text-base leading-7 text-muted-foreground">
+                    {description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Seção 3: Projetos em Destaque - ID ADICIONADO */}
-      <section id="projects" className="w-full py-12 md:py-24 lg:py-32 bg-background scroll-mt-16">
+      <section className="landing-section w-full py-[var(--section-y)]">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Projetos em Destaque</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                Explore nossas iniciativas de pesquisa e inovações tecnológicas.
-              </p>
-            </div>
+          <div id="projects" className="mx-auto flex max-w-3xl scroll-mt-24 flex-col items-center justify-center gap-4 text-center" data-scroll-reveal>
+            <div className="section-kicker">Projetos</div>
+            <h2 className="font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl md:text-5xl">Projetos em Destaque</h2>
+            <p className="text-base leading-8 text-muted-foreground md:text-xl">
+              Explore nossas iniciativas de pesquisa e inovações tecnológicas.
+            </p>
           </div>
-          <div className="mt-8 w-full max-w-6xl mx-auto px-4 md:px-6">
+          <div className="mx-auto mt-10 w-full max-w-6xl" data-scroll-reveal>
             <Projects />
-          </div>
-          <div className="flex justify-center mt-12">
-            <Button asChild size="lg">
-              <Link href="/projects">
-                Ver Todos os Projetos <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
 
       {/* Seção 4: Conheça Nossa Equipe - ID ADICIONADO */}
-      <section id="team" className="w-full py-12 md:py-24 lg:py-32 bg-background-1000 scroll-mt-16">
+      <section className="landing-section w-full py-[var(--section-y)]">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Conheça Nossa Equipe</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                Nossa equipe de desenvolvedores reúne expertise de várias disciplinas.
-              </p>
-            </div>
+          <div id="team" className="mx-auto flex max-w-3xl scroll-mt-24 flex-col items-center justify-center gap-4 text-center" data-scroll-reveal>
+            <div className="section-kicker">Equipe</div>
+            <h2 className="font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl md:text-5xl">Conheça Nossa Equipe</h2>
+            <p className="text-base leading-8 text-muted-foreground md:text-xl">
+              Nossa equipe de desenvolvedores reúne expertise de várias disciplinas.
+            </p>
           </div>
-          <div className="mx-auto grid max-w-5xl gap-8 py-12">
+          <div className="mx-auto grid max-w-6xl gap-8 py-12" data-scroll-reveal>
             <TeamMembers />
-          </div>
-          <div className="flex justify-center">
-            <Button asChild>
-              <Link href="/team">
-                Conheça a Equipe Completa <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
 
       {/* Seção 5: Eventos - ID ADICIONADO */}
-      <section id="events" className="w-full py-12 md:py-24 lg:py-32 bg-background scroll-mt-16">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">
-             <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Agenda do Labriot</h2>
-             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-               Estes são os próximos eventos, conferências e workshops que o Labriot irá participar e apresentar suas pesquisas.
-             </p>
-          </div>
-          
-          <UpcomingEvents />
+      {settings.enableEvents ? (
+        <section className="landing-section w-full py-[var(--section-y-sm)]">
+          <div className="container px-4 md:px-6">
+            <div id="events" className="mx-auto mb-9 flex max-w-3xl scroll-mt-24 flex-col items-center justify-center gap-4 text-center" data-scroll-reveal>
+               <div className="section-kicker">Agenda</div>
+               <h2 className="font-display text-3xl font-semibold tracking-[-0.04em] md:text-5xl">Agenda do Labriot</h2>
+               <p className="text-base leading-8 text-muted-foreground md:text-xl">
+                 Acompanhe a agenda do Labriot, incluindo próximos encontros e registros recentes das nossas atividades.
+               </p>
+            </div>
+            
+            <div data-scroll-reveal>
+              <UpcomingEvents />
+            </div>
 
-          <div className="flex justify-center mt-10">
-            <Button asChild className="mt-6">
-              <Link href="/events">
-                Ver Todos os Eventos <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="mt-7 flex justify-center" data-scroll-reveal>
+              <Button asChild>
+                <Link href="/events">
+                  Ver Todos os Eventos <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       {/* Seção 6: Colabore (Contato) - ID ADICIONADO */}
-      <section id="contact" className="w-full py-12 md:py-24 lg:py-32 bg-background-1000 scroll-mt-16">
-        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-          <div className="space-y-3">
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Colabore com o Labriot</h2>
-            <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed">
-              Interessado em fazer parceria conosco em projetos de pesquisa ou explorar potenciais colaborações?
-            </p>
-          </div>
-          <div className="mx-auto w-full max-w-sm space-y-2">
-            <Button asChild size="lg" className="w-full">
-              <Link href="/contact">Contate Nossa Equipe</Link>
-            </Button>
+      <section id="contact" className="landing-section w-full scroll-mt-20 pb-12 pt-6 md:pb-16 md:pt-8">
+        <div className="container px-4 text-center md:px-6">
+          <div className="mx-auto max-w-4xl px-6 py-10 md:px-12 md:py-12" data-scroll-reveal>
+            <div className="space-y-4">
+              <div className="section-kicker mx-auto">Contato</div>
+              <h2 className="font-display text-3xl font-semibold tracking-[-0.04em] md:text-5xl">Colabore com o Labriot</h2>
+              <p className="mx-auto max-w-2xl text-base leading-8 text-muted-foreground md:text-xl">
+                Interessado em fazer parceria conosco em projetos de pesquisa ou explorar potenciais colaborações?
+              </p>
+            </div>
+            <div className="mx-auto mt-8 w-full max-w-sm">
+              <Button asChild size="lg" className="h-12 w-full rounded-[var(--radius-button)] shadow-[var(--shadow-button)] transition-all duration-300 hover:-translate-y-0.5">
+                <Link href="/contact">
+                  Contate Nossa Equipe <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

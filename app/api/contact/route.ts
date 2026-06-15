@@ -1,47 +1,43 @@
-// app/api/contact/route.ts
-import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { NextResponse } from "next/server";
+import { enforceRequestRateLimit } from "@/lib/request-security";
+import { contactPayloadSchema, formatZodErrors } from "@/lib/validations/contact";
 
 export async function POST(request: Request) {
-  try {
-    const { name, email, organization, inquiryType, message, interest } = await request.json();
+  const payload = await request.json();
+  const validation = contactPayloadSchema.safeParse(payload);
 
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { message: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      );
-    }
-    // Crie um transportador do nodemailer
-    const transporter = nodemailer.createTransport({
-      service: 'gmail', // ou outro provedor de e-mail
-      auth: {
-        user: process.env.EMAIL_USER, // Seu e-mail do Gmail
-        pass: process.env.EMAIL_PASS, // A senha de aplicativo do seu e-mail
+  if (!validation.success) {
+    return NextResponse.json(
+      {
+        message: "Dados invalidos.",
+        errors: formatZodErrors(validation.error),
       },
-    });
-
-    const mailOptions = {
-      from: email,
-      to: 'labriot.utfpr@gmail.com',
-      subject: `Nova mensagem de contato de ${name}`,
-      html: `
-        <h1>Nova Mensagem de Contato</h1>
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Organização:</strong> ${organization}</p>
-        <p><strong>Tipo de Consulta:</strong> ${inquiryType}</p>
-        <p><strong>Área de Interesse:</strong> ${interest}</p>
-        <p><strong>Mensagem:</strong></p>
-        <p>${message}</p>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    return NextResponse.json({ message: 'Email enviado com sucesso!' });
-  } catch (error) {
-    console.error(error);
-    return new Response('Ocorreu um erro ao enviar o email.', { status: 500 });
+      { status: 400 }
+    );
   }
+
+  const rateLimit = enforceRequestRateLimit({
+    scope: "contact",
+    request,
+    ipRule: {
+      limit: 8,
+      windowMs: 15 * 60 * 1000,
+    },
+    identityRule: {
+      limit: 3,
+      windowMs: 30 * 60 * 1000,
+    },
+    identityKey: validation.data.email,
+    message: "Muitas mensagens enviadas. Tente novamente mais tarde.",
+  });
+
+  if (rateLimit) {
+    return rateLimit;
+  }
+
+  if (validation.data.botcheck) {
+    return NextResponse.json({ message: "Mensagem enviada com sucesso." });
+  }
+
+  return NextResponse.json({ message: "Validacao concluida." });
 }

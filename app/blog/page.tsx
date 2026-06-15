@@ -1,33 +1,20 @@
-"use client"
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { getPublicPosts, getPublicSiteSettings } from "@/lib/public-data"
+import { notFound } from "next/navigation"
+import type { PostRecord } from "@/lib/repositories/posts"
 
-interface Post {
-  id: number;
-  title: string;
-  author: string;
-  date: string;
-  content: string;
-}
+export default async function BlogPage() {
+  const settings = await getPublicSiteSettings()
 
-export default function BlogPage() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  if (!settings.enableBlog) {
+    notFound()
+  }
 
-  useEffect(() => {
-    fetch('/api/posts')
-      .then(res => res.json())
-      .then(data => {
-        setPosts(data);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div>Carregando...</div>;
+  const posts = await getPublicPosts() as PostRecord[]
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -36,7 +23,7 @@ export default function BlogPage() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Blog Labriot</h1>
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Blog {settings.siteName}</h1>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
                   Mantenha-se atualizado com nossos mais recentes avanços de pesquisa, insights e eventos em robótica e
                   IA.
@@ -55,7 +42,9 @@ export default function BlogPage() {
                 <Card key={post.id}>
                   <CardHeader>
                     <CardTitle>{post.title}</CardTitle>
-                    <CardDescription>{post.author} • {new Date(post.date).toLocaleDateString()}</CardDescription>
+                    <CardDescription>
+                      {post.author || "Autor nao informado"} • {post.date ? new Date(post.date).toLocaleDateString() : "Sem data"}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground truncate">{post.content}</p>

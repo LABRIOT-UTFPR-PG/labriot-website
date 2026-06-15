@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getApiErrorMessage } from '@/lib/form-errors';
 import { ArrowLeft } from 'lucide-react';
 
-export default function EditPublication({ params }: { params: { id: string } }) {
+export default function EditPublication({ params }: { params: Promise<{ id: string }> }) {
   const [publication, setPublication] = useState({
     title: '',
     authors: '',
@@ -20,12 +21,21 @@ export default function EditPublication({ params }: { params: { id: string } }) 
     description: '',
   });
   const router = useRouter();
-  const { id } = params;
+  const [id, setId] = useState("");
+
+  useEffect(() => {
+    params.then(({ id }) => setId(id));
+  }, [params]);
 
   useEffect(() => {
     if (id) {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       fetch(`/api/publications/${id}`)
-        .then(res => res.json())
+        .then(async res => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Falha ao carregar publicacao");
+          return data;
+        })
         .then(data => {
           setPublication(data);
         });
@@ -39,11 +49,19 @@ export default function EditPublication({ params }: { params: { id: string } }) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch(`/api/publications/${id}`, {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch(`/api/publications/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(publication),
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      alert(getApiErrorMessage(payload, 'Nao foi possivel salvar as alteracoes.'));
+      return;
+    }
+
     router.push('/admin/publications');
   };
 

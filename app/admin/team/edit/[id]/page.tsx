@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getApiErrorMessage } from '@/lib/form-errors';
 
 export default function EditTeamMember({ params }: { params: Promise<{ id: string }> }) {
   const [id, setId] = useState<string | null>(null);
@@ -25,6 +26,7 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     if (id) {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       fetch(`/api/team/${id}`)
         .then(res => {
             if (!res.ok) throw new Error("Falha ao buscar");
@@ -33,9 +35,9 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
         .then(data => {
           setName(data.name || '');
           setSpecialization(data.specialization || '');
-          setCategory(data.category || 'Equipe');
+          setCategory(data.category || '');
           setImage(data.image || '');
-          setLinkedin(data.linkedin || ''); // Carrega linkedin
+          setLinkedin(data.linkedin || '');
           setLoading(false);
         })
         .catch(err => {
@@ -49,11 +51,19 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
     e.preventDefault();
     if (!id) return;
 
-    await fetch(`/api/team/${id}`, {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch(`/api/team/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, specialization, category, image, linkedin }), // Salva category e linkedin
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      alert(getApiErrorMessage(payload, 'Não foi possível salvar as alterações.'));
+      return;
+    }
+
     router.push('/admin/team');
   };
 
@@ -77,12 +87,12 @@ export default function EditTeamMember({ params }: { params: Promise<{ id: strin
                     </div>
                     <div>
                         <Label htmlFor="category">Setor / Grupo</Label>
-                        <Input 
-                          id="category" 
-                          value={category} 
-                          onChange={(e) => setCategory(e.target.value)} 
-                          placeholder="Ex: Professores, Liderança, Alunos de Mestrado" 
-                          required 
+                        <Input
+                          id="category"
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          placeholder="Ex: Hardware e Financeiro"
+                          required
                         />
                     </div>
                     <div>

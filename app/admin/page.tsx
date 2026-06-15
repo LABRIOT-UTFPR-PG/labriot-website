@@ -4,32 +4,10 @@ import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, Folder, Users, BookOpen, Calendar, ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { openDb } from "@/lib/db"
-
-async function getStats() {
-  try {
-    const db = await openDb()
-    const [projects, team, publications, posts, events] = await Promise.all([
-      db.get('SELECT COUNT(*) as count FROM projects'),
-      db.get('SELECT COUNT(*) as count FROM team'),
-      db.get('SELECT COUNT(*) as count FROM publications'),
-      db.get('SELECT COUNT(*) as count FROM posts'),
-      db.get('SELECT COUNT(*) as count FROM events'),
-    ])
-    return {
-      projects: Number(projects?.count ?? 0),
-      team: Number(team?.count ?? 0),
-      publications: Number(publications?.count ?? 0),
-      posts: Number(posts?.count ?? 0),
-      events: Number(events?.count ?? 0),
-    }
-  } catch {
-    return { projects: 0, team: 0, publications: 0, posts: 0, events: 0 }
-  }
-}
+import { getAdminDashboardStats } from "@/lib/admin-data"
 
 export default async function AdminDashboard() {
-  const counts = await getStats()
+  const counts = await getAdminDashboardStats()
 
   const stats = [
     { title: "Projetos", value: counts.projects, icon: Folder, link: "/admin/projects" },
@@ -44,7 +22,9 @@ export default async function AdminDashboard() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <div className="flex items-center gap-2">
-          <Button variant="outline">Exportar Dados</Button>
+          <Button variant="outline" asChild>
+            <a href="/api/admin/export?scope=all">Exportar Dados</a>
+          </Button>
           <Button>Novo Conteúdo</Button>
         </div>
       </div>

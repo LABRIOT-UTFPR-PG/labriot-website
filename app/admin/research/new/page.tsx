@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { getApiErrorMessage } from '@/lib/form-errors';
 
 export default function NewResearch() {
   const [title, setTitle] = useState('');
@@ -18,11 +19,23 @@ export default function NewResearch() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/research', {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch('/api/research', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, description }),
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      toast({
+        title: "Nao foi possivel salvar",
+        description: getApiErrorMessage(payload, "Verifique os campos e tente novamente."),
+        variant: "destructive",
+      });
+      return;
+    }
+
     toast({
       title: "Área de pesquisa salva",
       description: "A nova área de pesquisa foi salva com sucesso.",

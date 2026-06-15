@@ -10,8 +10,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Save, Calendar as CalendarIcon, Clock, MapPin } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { getApiErrorMessage } from '@/lib/form-errors';
 
-export default function EditEvent({ params }: { params: { id: string } }) {
+export default function EditEvent({ params }: { params: Promise<{ id: string }> }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -21,11 +22,16 @@ export default function EditEvent({ params }: { params: { id: string } }) {
   });
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { id } = params;
+  const [id, setId] = useState("");
+
+  useEffect(() => {
+    params.then(({ id }) => setId(id));
+  }, [params]);
 
   // Carregar dados do evento
   useEffect(() => {
     if (id) {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       fetch(`/api/events/${id}`)
         .then(res => {
           if (!res.ok) throw new Error("Erro ao carregar");
@@ -50,11 +56,23 @@ export default function EditEvent({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch(`/api/events/${id}`, {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+      const response = await fetch(`/api/events/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        toast({
+          title: "Nao foi possivel salvar",
+          description: getApiErrorMessage(payload, "Verifique os campos e tente novamente."),
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({ title: "Evento atualizado", description: "As alterações foram salvas com sucesso." });
       router.push('/admin/events');
     } catch (error) {

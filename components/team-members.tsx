@@ -2,24 +2,30 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { openDb } from "@/lib/db"
+import { getSafeHref, getSafeImageSrc } from "@/lib/media"
+import { getPublicTeam } from "@/lib/public-data"
 
 type TeamMember = {
-  id: number;
+  id: number | string;
   name: string;
-  specialization: string;
+  specialization: string | null;
   category: string;
-  image: string;
-  linkedin: string;
+  image: string | null;
+  linkedin: string | null;
 };
 
+function getCategoryLabel(category: string) {
+  if (category === 'leadership') return 'Liderança';
+  if (category === 'students') return 'Estudantes';
+  return category || 'Equipe';
+}
+
 export default async function TeamMembers() {
-  const db = await openDb()
-  const team = await db.all('SELECT * FROM team ORDER BY id ASC') as TeamMember[]
+  const team = await getPublicTeam() as TeamMember[]
 
   // Agrupar por categoria
   const groupedTeam = team.reduce((acc, member) => {
-    const category = member.category || 'Equipe';
+    const category = getCategoryLabel(member.category);
     if (!acc[category]) {
       acc[category] = [];
     }
@@ -28,37 +34,37 @@ export default async function TeamMembers() {
   }, {} as Record<string, TeamMember[]>);
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-14">
       {Object.entries(groupedTeam).map(([category, members]) => (
         <div key={category} className="space-y-8">
-          <h3 className="text-2xl font-bold text-center border-b pb-2">{category}</h3>
+          <h3 className="section-kicker mx-auto">{category}</h3>
           {/* flex-wrap e justify-center centralizam perfeitamente os cards mesmo quando há poucos membros */}
           <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
             {members.map((member) => (
-              <Card key={member.id} className="overflow-hidden w-full max-w-[240px] mx-auto border bg-card shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-square relative w-full overflow-hidden">
+              <Card key={member.id} className="premium-card group mx-auto w-full max-w-[260px] !border-0 !bg-transparent !shadow-none">
+                <div className="relative m-3 aspect-[4/4.5] overflow-hidden rounded-2xl bg-muted/40">
                   <Image 
-                    src={member.image || "/placeholder.svg"} 
+                    src={getSafeImageSrc(member.image)} 
                     alt={member.name} 
                     fill 
-                    className="object-cover transition-transform duration-300 hover:scale-105" 
+                    className="object-cover transition-transform duration-700 group-hover:scale-110" 
                   />
                 </div>
-                <CardHeader className="p-3">
-                  <CardTitle className="text-base font-bold text-foreground truncate" title={member.name}>
+                <CardHeader className="p-5 pb-2">
+                  <CardTitle className="truncate font-display text-lg font-semibold tracking-[-0.035em] text-foreground" title={member.name}>
                     {member.name}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 pt-0 pb-2">
-                  <p className="text-xs text-muted-foreground truncate" title={member.specialization}>
+                <CardContent className="px-5 pb-4 pt-0">
+                  <p className="truncate text-sm text-muted-foreground" title={member.specialization ?? undefined}>
                     {member.specialization}
                   </p>
                 </CardContent>
-                <CardFooter className="p-3 pt-0">
-                  {member.linkedin ? (
-                    <Button variant="outline" size="sm" asChild className="w-full h-8 text-xs">
+                <CardFooter className="p-5 pt-0">
+                  {getSafeHref(member.linkedin) ? (
+                    <Button variant="outline" size="sm" asChild className="h-9 w-full text-xs">
                       <Link 
-                        href={member.linkedin} 
+                        href={getSafeHref(member.linkedin) ?? "#"} 
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -66,7 +72,7 @@ export default async function TeamMembers() {
                       </Link>
                     </Button>
                   ) : (
-                    <Button variant="outline" size="sm" disabled className="w-full h-8 text-xs opacity-50 cursor-not-allowed">
+                    <Button variant="outline" size="sm" disabled className="h-9 w-full cursor-not-allowed text-xs opacity-50">
                       Sem Perfil
                     </Button>
                   )}

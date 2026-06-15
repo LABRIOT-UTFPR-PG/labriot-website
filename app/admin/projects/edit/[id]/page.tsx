@@ -10,8 +10,24 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
+import { getApiErrorMessage } from '@/lib/form-errors';
 
-export default function EditProject({ params }: { params: { id: string } }) {
+function normalizeDateInput(value: unknown) {
+  if (typeof value !== "string") return "";
+
+  const date = value.trim();
+  if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(date)) {
+    return date;
+  }
+
+  if (/^\d{4}-(0[1-9]|1[0-2])$/.test(date)) {
+    return `${date}-01`;
+  }
+
+  return "";
+}
+
+export default function EditProject({ params }: { params: Promise<{ id: string }> }) {
   const [projectData, setProjectData] = useState({
     title: '',
     status: '',
@@ -23,26 +39,38 @@ export default function EditProject({ params }: { params: { id: string } }) {
     url: '',
   });
   const router = useRouter();
-  const { id } = params;
+  const [id, setId] = useState("");
+
+  useEffect(() => {
+    params.then(({ id }) => setId(id));
+  }, [params]);
 
   useEffect(() => {
     if (id) {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       fetch(`/api/projects/${id}`)
-        .then(res => res.json())
+        .then(async res => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Falha ao carregar projeto");
+          return data;
+        })
         .then(data => {
           setProjectData({
             title: data.title || '',
             status: data.status || '',
-            startDate: data.startDate || '',
-            endDate: data.endDate || '',
+            startDate: normalizeDateInput(data.startDate),
+            endDate: normalizeDateInput(data.endDate),
             description: data.description || '',
             fullDescription: data.fullDescription || data.fulldescription || '',
             image: data.image || '',
             url: data.url || '',
           });
+        })
+        .catch(() => {
+          router.push('/admin/projects');
         });
     }
-  }, [id]);
+  }, [id, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -55,11 +83,19 @@ export default function EditProject({ params }: { params: { id: string } }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch(`/api/projects/${id}`, {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch(`/api/projects/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(projectData),
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      alert(getApiErrorMessage(payload, "Nao foi possivel salvar as alteracoes."));
+      return;
+    }
+
     router.push('/admin/projects');
   };
 
@@ -104,7 +140,7 @@ export default function EditProject({ params }: { params: { id: string } }) {
                 <Input
                   id="startDate"
                   name="startDate"
-                  type="month"
+                  type="date"
                   value={projectData.startDate}
                   onChange={handleChange}
                 />
@@ -116,7 +152,7 @@ export default function EditProject({ params }: { params: { id: string } }) {
                   <Input
                     id="endDate"
                     name="endDate"
-                    type="month"
+                    type="date"
                     value={projectData.endDate}
                     onChange={handleChange}
                   />

@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Plus, Search, Edit, Eye } from "lucide-react"
-import { openDb } from "@/lib/db"
 import DeleteMemberButton from "@/components/delete-member-button"
+import { getSafeImageSrc } from "@/lib/media"
+import { getTeamRepository } from "@/lib/repositories/team"
 
 export default async function TeamAdmin() {
-  const db = await openDb()
-  const team = await db.all('SELECT * FROM team ORDER BY id DESC')
+  const team = (await getTeamRepository().list()).slice().reverse()
 
   return (
     <div className="space-y-6">
@@ -37,7 +37,7 @@ export default async function TeamAdmin() {
         {team.map((member) => (
           <Card key={member.id} className="overflow-hidden">
             <div className="aspect-square relative">
-              <Image src={member.image || "/placeholder.svg"} alt={member.name} fill className="object-cover" />
+              <Image src={getSafeImageSrc(member.image)} alt={member.name} fill className="object-cover" />
             </div>
             <CardHeader>
               <CardTitle>{member.name}</CardTitle>

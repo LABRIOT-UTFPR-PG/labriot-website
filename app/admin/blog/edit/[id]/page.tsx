@@ -10,8 +10,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { getApiErrorMessage } from '@/lib/form-errors';
 
-export default function EditPost({ params }: { params: { id: string } }) {
+export default function EditPost({ params }: { params: Promise<{ id: string }> }) {
   const [postData, setPostData] = useState({
     title: '',
     summary: '',
@@ -21,12 +22,21 @@ export default function EditPost({ params }: { params: { id: string } }) {
     image: '',
   });
   const router = useRouter();
-  const { id } = params;
+  const [id, setId] = useState("");
+
+  useEffect(() => {
+    params.then(({ id }) => setId(id));
+  }, [params]);
 
   useEffect(() => {
     if (id) {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       fetch(`/api/posts/${id}`)
-        .then(res => res.json())
+        .then(async res => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Falha ao carregar post");
+          return data;
+        })
         .then(data => {
           setPostData({
             title: data.title || '',
@@ -47,11 +57,22 @@ export default function EditPost({ params }: { params: { id: string } }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch(`/api/posts/${id}`, {
+    const response = await fetch(`/api/posts/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(postData),
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      toast({
+        title: "Nao foi possivel salvar",
+        description: getApiErrorMessage(payload, "Verifique os campos e tente novamente."),
+        variant: "destructive",
+      });
+      return;
+    }
+
     toast({
       title: "Post atualizado",
       description: "O post foi atualizado com sucesso.",

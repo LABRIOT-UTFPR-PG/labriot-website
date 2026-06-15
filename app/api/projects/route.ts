@@ -1,21 +1,70 @@
-import { NextResponse } from 'next/server';
-import { openDb } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { recordAdminAudit } from "@/lib/audit";
+import { databaseUnavailableResponse, isDatabaseConfigured } from "@/lib/api";
+import { getClientIp } from "@/lib/rate-limit";
+import { getProjectRepository } from "@/lib/repositories/projects";
+import { getCurrentAdminActor } from "@/lib/server-admin-session";
+import { enforceRequestRateLimit } from "@/lib/request-security";
+import { formatZodErrors, projectPayloadSchema } from "@/lib/validations/project";
 
 export async function GET() {
-  const db = await openDb();
-  const projects = await db.all('SELECT id, title, description, status, startdate AS "startDate", enddate AS "endDate", image, url, "fullDescription" FROM projects');
+  const projects = await getProjectRepository().list();
   return NextResponse.json(projects);
 }
 
 export async function POST(request: Request) {
-  const db = await openDb();
-  const data = await request.json();
-  const { title, description, status, startDate, endDate, image, url, fullDescription } = data;
+  if (!isDatabaseConfigured()) {
+    return databaseUnavailableResponse();
+  }
 
-  const result = await db.run(
-    'INSERT INTO projects (title, description, status, startDate, endDate, image, url, "fullDescription") VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-    [title, description, status, startDate, endDate, image, url, fullDescription]
-  );
+  const actor = await getCurrentAdminActor();
 
-  return NextResponse.json({ id: result.lastID, ...data });
+  if (!actor) {
+    return NextResponse.json({ message: "Autenticacao de administrador obrigatoria." }, { status: 401 });
+  }
+
+  const rateLimit = enforceRequestRateLimit({
+    scope: "projects:create",
+    request,
+    ipRule: {
+      limit: 120,
+      windowMs: 15 * 60 * 1000,
+    },
+    identityRule: {
+      limit: 60,
+      windowMs: 15 * 60 * 1000,
+    },
+    identityKey: actor.userId,
+    message: "Muitas alteracoes de projetos. Tente novamente mais tarde.",
+  });
+
+  if (rateLimit) {
+    return rateLimit;
+  }
+
+  const payload = await request.json();
+  const validation = projectPayloadSchema.safeParse(payload);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      {
+        message: "Dados invalidos.",
+        errors: formatZodErrors(validation.error),
+      },
+      { status: 400 }
+    );
+  }
+
+  const project = await getProjectRepository().create(validation.data);
+  await recordAdminAudit({
+    actor,
+    action: "create",
+    resourceType: "project",
+    resourceId: String(project.id),
+    resourceLabel: project.title,
+    summary: `Criou o projeto ${project.title}.`,
+    ip: getClientIp(request),
+  });
+
+  return NextResponse.json(project, { status: 201 });
 }

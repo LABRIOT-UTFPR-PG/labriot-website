@@ -7,6 +7,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AlertCircle, Loader2 } from "lucide-react"
+import { getApiErrorMessage } from "@/lib/form-errors"
+
+function getSafeAdminNextPath(rawNext: string | null) {
+  if (!rawNext) {
+    return "/admin"
+  }
+
+  if (!rawNext.startsWith("/admin")) {
+    return "/admin"
+  }
+
+  if (rawNext.startsWith("//") || rawNext.includes("\n") || rawNext.includes("\r")) {
+    return "/admin"
+  }
+
+  return rawNext
+}
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -21,6 +38,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -28,9 +46,11 @@ export default function LoginPage() {
       })
 
       if (response.ok) {
-        router.push("/admin")
+        const next = new URLSearchParams(window.location.search).get("next")
+        router.push(getSafeAdminNextPath(next))
       } else {
-        setError("Usuário ou senha incorretos. Tente novamente.")
+        const payload = await response.json().catch(() => null)
+        setError(getApiErrorMessage(payload, "Usuario ou senha incorretos. Tente novamente."))
         setPassword("")
       }
     } catch {

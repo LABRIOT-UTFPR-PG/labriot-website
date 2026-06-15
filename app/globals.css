@@ -2,13 +2,209 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display), sans-serif;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-reveal-ready [data-scroll-reveal] {
+    backface-visibility: hidden;
+    transform-origin: center top;
+    will-change: opacity, transform;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Mirrors the deployed site's effective background for legacy sections. */
+  .bg-background-1000 {
+    background-color: hsl(var(--background));
+  }
+}
+
+@layer components {
+  .landing-flow {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: hsl(var(--background));
+  }
+
+  .landing-flow::before {
+    content: "";
+    position: absolute;
+    top: -12%;
+    left: -24%;
+    width: 48rem;
+    height: 48rem;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 999px;
+    background: radial-gradient(
+      circle,
+      hsl(var(--forrm-glow) / 0.16) 0%,
+      hsl(var(--foreground) / 0.055) 34%,
+      transparent 68%
+    );
+    opacity: 0.58;
+    transform: translate3d(0, var(--scroll-parallax-y, 0), 0);
+    will-change: transform;
+  }
+
+  .landing-flow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(hsl(var(--foreground) / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.045) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: radial-gradient(ellipse 82% 46% at 50% 0%, black 0%, transparent 74%);
+    opacity: 0.26;
+  }
+
+  .landing-section {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .landing-section > .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .premium-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid hsl(var(--line));
+    border-radius: var(--radius-card);
+    background:
+      linear-gradient(180deg, hsl(var(--surface-card) / 0.82), hsl(var(--surface-card) / 0.62)),
+      hsl(var(--background));
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 240ms ease,
+      box-shadow 260ms ease,
+      transform 260ms ease,
+      background 260ms ease;
+  }
+
+  .premium-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      620px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+      hsl(var(--forrm-glow) / 0.08),
+      transparent 62%
+    );
+    opacity: 0;
+    transition: opacity 320ms ease;
+  }
+
+  .premium-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow: inset 0 1px 0 hsl(var(--foreground) / 0.055);
+  }
+
+  .premium-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
+  }
+
+  .premium-card:hover::before {
+    opacity: 0.26;
+  }
+
+  .premium-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid hsl(var(--line));
+    border-radius: var(--radius-card);
+    background: hsl(var(--surface-card) / 0.58);
+    box-shadow: 0 18px 44px hsl(0 0% 0% / 0.16);
+  }
+
+  .footer-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .forrm-number {
+    color: hsl(var(--forrm-glow));
+    font-family: var(--font-display), sans-serif;
+    font-size: 0.94rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+
+  .section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid hsl(var(--line));
+    border-radius: 999px;
+    background: hsl(var(--surface-card) / 0.72);
+    padding: 0.35rem 0.8rem;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.875rem;
+    font-weight: 650;
+    box-shadow: var(--shadow-soft);
   }
 }
 
@@ -38,7 +234,21 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.85rem;
+    --radius-card: 1.25rem;
+    --radius-button: 0.95rem;
+    --surface-card: 0 0% 100%;
+    --surface-muted: 0 0% 97%;
+    --line: 0 0% 88%;
+    --line-strong: 0 0% 76%;
+    --forrm-glow: 118 14% 48%;
+    --forrm-line: 112 12% 58%;
+    --shadow-soft: 0 10px 30px hsl(0 0% 0% / 0.06);
+    --shadow-card: 0 20px 70px hsl(0 0% 0% / 0.08);
+    --shadow-card-hover: 0 28px 90px hsl(0 0% 0% / 0.13);
+    --shadow-button: 0 12px 34px hsl(0 0% 0% / 0.16);
+    --section-y: clamp(5rem, 8vw, 8rem);
+    --section-y-sm: clamp(3.75rem, 6vw, 6rem);
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -74,6 +284,16 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --surface-card: 0 0% 5.2%;
+    --surface-muted: 0 0% 7.5%;
+    --line: 0 0% 16%;
+    --line-strong: 0 0% 26%;
+    --forrm-glow: 112 17% 68%;
+    --forrm-line: 112 12% 42%;
+    --shadow-soft: 0 14px 42px hsl(0 0% 0% / 0.24);
+    --shadow-card: 0 22px 70px hsl(0 0% 0% / 0.32);
+    --shadow-card-hover: 0 32px 110px hsl(0 0% 0% / 0.48);
+    --shadow-button: 0 16px 44px hsl(0 0% 0% / 0.36);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -91,6 +311,6 @@ body {
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
 }

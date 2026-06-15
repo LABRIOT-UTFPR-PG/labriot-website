@@ -4,7 +4,7 @@ import { type ReactNode } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { LayoutDashboard, FileText, Users, Folder, BookOpen, Calendar, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, Users, Folder, BookOpen, Calendar, Settings, LogOut, Shield, ScrollText, ClipboardCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -85,6 +85,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     </Link>
                   </Button>
                   <Button variant="ghost" className="w-full justify-start" asChild>
+                    <Link href="/admin/attendance">
+                      <ClipboardCheck className="mr-2 h-4 w-4" />
+                      Presenças
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/publications">
                       <BookOpen className="mr-2 h-4 w-4" />
                       Publicações
@@ -108,9 +114,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Sistema</h2>
                 <div className="space-y-1">
                   <Button variant="ghost" className="w-full justify-start" asChild>
+                    <Link href="/admin/admins">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Administradores
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link href="/admin/settings">
                       <Settings className="mr-2 h-4 w-4" />
                       Configurações
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start" asChild>
+                    <Link href="/admin/swagger">
+                      <ScrollText className="mr-2 h-4 w-4" />
+                      Swagger
                     </Link>
                   </Button>
                 </div>

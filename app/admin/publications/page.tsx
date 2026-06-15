@@ -4,19 +4,19 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getApiErrorMessage } from "@/lib/form-errors"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, Search, Edit, Trash2, ExternalLink } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface Publication {
-  id: number;
+  id: string;
   title: string;
   authors: string;
-  journal: string;
+  journal: string | null;
   year: number;
-  doi: string;
-  description: string;
+  doi: string | null;
+  description: string | null;
 }
 
 export default function PublicationsAdmin() {
@@ -24,6 +24,7 @@ export default function PublicationsAdmin() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
     fetch('/api/publications')
       .then(res => res.json())
       .then(data => {
@@ -32,9 +33,16 @@ export default function PublicationsAdmin() {
       });
   }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta publicação?')) {
-      await fetch(`/api/publications/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/publications/${id}`, { method: 'DELETE' });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        alert(getApiErrorMessage(payload, "Nao foi possivel excluir a publicacao."));
+        return;
+      }
+
       setPublications(publications.filter(p => p.id !== id));
     }
   };
@@ -60,11 +68,13 @@ export default function PublicationsAdmin() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input type="search" placeholder="Buscar publicações..." className="w-full bg-background pl-8" />
         </div>
-        <Button variant="outline">Exportar</Button>
+        <Button variant="outline" asChild>
+          <a href="/api/admin/export?scope=publications">Exportar</a>
+        </Button>
       </div>
 
-      <Tabs defaultValue={years.length > 0 ? years[0].toString() : ""} className="w-full">
-        <TabsList className={`grid w-full grid-cols-${years.length}`}>
+      <Tabs defaultValue={years.length > 0 ? years[0].toString() : "empty"} className="w-full">
+        <TabsList className="flex w-full flex-wrap justify-start gap-2">
           {years.map(year => (
             <TabsTrigger key={year} value={year.toString()}>{year}</TabsTrigger>
           ))}
@@ -81,12 +91,12 @@ export default function PublicationsAdmin() {
                 <CardContent>
                   <div className="space-y-1">
                     <p className="text-sm">
-                      <span className="font-medium">Publicado em:</span> {publication.journal}, {publication.year}
+                      <span className="font-medium">Publicado em:</span> {publication.journal || "Nao informado"}, {publication.year}
                     </p>
                     <p className="text-sm">
-                      <span className="font-medium">DOI:</span> {publication.doi}
+                      <span className="font-medium">DOI:</span> {publication.doi || "Nao informado"}
                     </p>
-                    <p className="text-sm text-muted-foreground">{publication.description}</p>
+                    <p className="text-sm text-muted-foreground">{publication.description || "Sem descricao."}</p>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">
@@ -102,12 +112,19 @@ export default function PublicationsAdmin() {
                       Excluir
                     </Button>
                   </div>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`https://doi.org/${publication.doi}`} target="_blank">
+                  {publication.doi ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`https://doi.org/${publication.doi}`} target="_blank">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Ver Publicação
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" disabled>
                       <ExternalLink className="mr-2 h-4 w-4" />
-                      Ver Publicação
-                    </Link>
-                  </Button>
+                      Sem DOI
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             ))}

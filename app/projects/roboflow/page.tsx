@@ -1,10 +1,11 @@
 import { Metadata } from "next";
 import { RoboflowUploader } from "@/components/RoboflowUploader";
 import Link from "next/link";
-import { ChevronLeft, Info, HelpCircle } from "lucide-react";
+import { ChevronLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getRoboflowEmbedUrl } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Projeto de Visão Computacional | Labriot",
@@ -12,7 +13,13 @@ export const metadata: Metadata = {
 };
 
 export default function RoboflowPage() {
-  const embedUrl = "https://app.roboflow.com/workflows/embed/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3JrZmxvd0lkIjoiWlNDUnNYWnEzNGJxQVduZHJ0bXoiLCJ3b3Jrc3BhY2VJZCI6IkRUZ1FtMmhpUlBVMkpKYVFUT2FBdzNBM0xTOTMiLCJ1c2VySWQiOiJEVGdRbTJoaVJQVTJKSmFRVE9hQXczQTNMUzkzIiwiaWF0IjoxNzc5MDQwNjQ4fQ.flbJjE-sljh-h_h6oiKlvbWWmqu_7mu1Ai8ZlbEHGs4";
+  let embedUrl: string | null = null;
+
+  try {
+    embedUrl = getRoboflowEmbedUrl();
+  } catch {
+    embedUrl = null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-24 max-w-5xl">
@@ -54,14 +61,22 @@ export default function RoboflowPage() {
             </CardHeader>
             <CardContent className="p-0 border-t">
               <div className="w-full bg-muted/20 relative" style={{ minHeight: "720px" }}>
-                <iframe
-                  src={embedUrl}
-                  width="100%"
-                  height="720px"
-                  frameBorder="0"
-                  allow="camera; microphone; clipboard-write;"
-                  className="w-full border-0"
-                />
+                {embedUrl ? (
+                  <iframe
+                    src={embedUrl}
+                    width="100%"
+                    height="720px"
+                    frameBorder="0"
+                    referrerPolicy="no-referrer"
+                    sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts allow-downloads"
+                    allow="camera; microphone; clipboard-write;"
+                    className="w-full border-0"
+                  />
+                ) : (
+                  <div className="flex h-[720px] items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                    O embed do Roboflow nao esta configurado neste ambiente.
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -71,7 +86,6 @@ export default function RoboflowPage() {
           <div className="bg-gradient-to-b from-muted/50 to-background border rounded-xl p-6 md:p-12 shadow-sm">
             <RoboflowUploader />
           </div>
-
         </TabsContent>
       </Tabs>
 

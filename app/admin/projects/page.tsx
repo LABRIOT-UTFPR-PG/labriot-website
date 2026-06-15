@@ -11,19 +11,37 @@ import { useEffect, useState } from "react"
 export default function ProjectsAdmin() {
   const [projects, setProjects] = useState<any[]>([])
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
     fetch('/api/projects')
-      .then(res => res.json())
+      .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Falha ao carregar projetos");
+        return data;
+      })
       .then(data => {
-        setProjects(data)
+        setProjects(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch((error) => {
+        setError(error.message)
         setLoading(false)
       })
   }, [])
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string | number) => {
     if (confirm('Tem certeza que deseja excluir este projeto?')) {
-      await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+      const response = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        alert(payload?.message || "Nao foi possivel excluir o projeto.");
+        return;
+      }
+
       setProjects(projects.filter(project => project.id !== id));
     }
   }
@@ -32,6 +50,7 @@ export default function ProjectsAdmin() {
   const completedProjects = projects.filter(p => p.status === 'completed');
 
   if (loading) return <div>Carregando...</div>
+  if (error) return <div className="text-sm text-destructive">{error}</div>
 
   return (
     <div className="space-y-6">
@@ -51,7 +70,9 @@ export default function ProjectsAdmin() {
           <Input type="search" placeholder="Buscar projetos..." className="w-full bg-background pl-8" />
         </div>
         <Button variant="outline">Filtros</Button>
-        <Button variant="outline">Exportar</Button>
+        <Button variant="outline" asChild>
+          <a href="/api/admin/export?scope=projects">Exportar</a>
+        </Button>
       </div>
 
       <Tabs defaultValue="ongoing" className="w-full">

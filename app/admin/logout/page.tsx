@@ -8,6 +8,7 @@ export default function LogoutPage() {
 
   useEffect(() => {
     const logout = async () => {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       await fetch('/api/auth/logout', {
         method: 'POST',
       });

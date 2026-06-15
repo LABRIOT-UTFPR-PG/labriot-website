@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { getApiErrorMessage } from "@/lib/form-errors"
 
 export default function NewBlogPost() {
   const [title, setTitle] = useState('');
@@ -22,11 +23,23 @@ export default function NewBlogPost() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/posts', {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
+    const response = await fetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, summary, content, author, date, image }),
     });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      toast({
+        title: "Nao foi possivel salvar",
+        description: getApiErrorMessage(payload, "Verifique os campos e tente novamente."),
+        variant: "destructive",
+      });
+      return;
+    }
+
     toast({
       title: "Post salvo",
       description: "O post foi salvo com sucesso.",

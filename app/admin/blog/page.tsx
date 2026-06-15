@@ -4,15 +4,16 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { getApiErrorMessage } from "@/lib/form-errors"
 import { Plus, Search, Edit, Trash2, Eye } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface Post {
-  id: number;
+  id: string;
   title: string;
-  author: string;
-  date: string;
-  content: string;
+  author: string | null;
+  date: string | null;
+  content: string | null;
 }
 
 export default function BlogAdmin() {
@@ -20,6 +21,7 @@ export default function BlogAdmin() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
     fetch('/api/posts')
       .then(res => res.json())
       .then(data => {
@@ -28,9 +30,16 @@ export default function BlogAdmin() {
       });
   }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este post?')) {
-      await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        alert(getApiErrorMessage(payload, "Nao foi possivel excluir o post."));
+        return;
+      }
+
       setPosts(posts.filter(post => post.id !== id));
     }
   };
@@ -63,7 +72,7 @@ export default function BlogAdmin() {
             <CardHeader>
               <CardTitle>{post.title}</CardTitle>
               <CardDescription>
-                {post.author} • {new Date(post.date).toLocaleDateString()}
+                {post.author || "Autor nao informado"} • {post.date ? new Date(post.date).toLocaleDateString() : "Sem data"}
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Save, Calendar as CalendarIcon, Clock, MapPin } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { getApiErrorMessage } from "@/lib/form-errors"
 
 export default function NewEvent() {
   const [formData, setFormData] = useState({
@@ -31,21 +32,28 @@ export default function NewEvent() {
     e.preventDefault();
     
     try {
+      // BACKEND RELATION: no projeto original, esta linha chamava uma rota API/backend.
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
         toast({
-          title: "Evento criado",
-          description: "O evento foi adicionado à agenda com sucesso.",
+          title: "Nao foi possivel salvar",
+          description: getApiErrorMessage(payload, "Verifique os campos e tente novamente."),
+          variant: "destructive",
         });
-        router.push('/admin/events');
-      } else {
-        throw new Error('Falha ao salvar');
+        return;
       }
+
+      toast({
+        title: "Evento criado",
+        description: "O evento foi adicionado à agenda com sucesso.",
+      });
+      router.push('/admin/events');
     } catch (error) {
       toast({
         title: "Erro",
