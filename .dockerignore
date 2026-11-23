@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+*_scratch.json
+backups
+deploy
+README.md
+Dockerfile
+docker-compose.yml

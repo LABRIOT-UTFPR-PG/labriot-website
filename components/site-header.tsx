@@ -1,43 +1,55 @@
-/* components/site-header.tsx */
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { usePathname, useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ArrowLeft, Menu } from "lucide-react";
+
+const NAV_ITEMS = [
+  { href: "/#projects", sectionId: "projects", label: "Projetos" },
+  { href: "/#team", sectionId: "team", label: "Equipe" },
+  { href: "/#events", sectionId: "events", label: "Agenda de Eventos" },
+  { href: "/blog", sectionId: null, label: "Blog" },
+  { href: "/projects/roboflow", sectionId: null, label: "Demo IA" },
+  { href: "/#contact", sectionId: "contact", label: "Contato" },
+];
 
 export function SiteHeader() {
-  const pathname = usePathname()
-  const router = useRouter()
+  const pathname = usePathname();
+  const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Função auxiliar para rolar suavemente se estivermos na home
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    if (pathname === "/") {
-      e.preventDefault()
-      const element = document.getElementById(id)
+  const scrollToSection = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string | null
+  ) => {
+    setMobileMenuOpen(false);
+    if (sectionId && pathname === "/") {
+      e.preventDefault();
+      const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" })
+        element.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }
+  };
 
   if (pathname?.startsWith("/admin")) {
-    return null
+    return null;
   }
 
-  // Se o caminho for uma subpágina de projetos ou blog, ela já possui seu próprio botão de voltar no corpo.
-  const hasCustomBackButton = pathname?.startsWith("/projects/") || pathname?.startsWith("/blog/")
+  const hasCustomBackButton =
+    pathname?.startsWith("/projects/") || pathname?.startsWith("/blog/");
 
-  // Função para voltar de forma inteligente com fallback para a home
   const handleBack = () => {
     if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back()
+      router.back();
     } else {
-      router.push("/")
+      router.push("/");
     }
-  }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -54,53 +66,55 @@ export function SiteHeader() {
               <span>Voltar</span>
             </Button>
           )}
-          {/* Logo ou Nome do Site */}
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-            {/* Se você tiver o logo, descomente a linha abaixo */}
-            {/* <Image src="/images/labriot-logo.png" width={32} height={32} alt="Labriot" /> */}
             <span>LABRIOT</span>
           </Link>
         </div>
 
-        {/* Menu Horizontal */}
+        {/* Menu Horizontal Desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <Link
-            href="/#projects"
-            onClick={(e) => scrollToSection(e, "projects")}
-            className="transition-colors hover:text-primary text-muted-foreground"
-          >
-            Projetos
-          </Link>
-          <Link
-            href="/#team"
-            onClick={(e) => scrollToSection(e, "team")}
-            className="transition-colors hover:text-primary text-muted-foreground"
-          >
-            Equipe
-          </Link>
-          <Link
-            href="/#events"
-            onClick={(e) => scrollToSection(e, "events")}
-            className="transition-colors hover:text-primary text-muted-foreground"
-          >
-            Agenda de Eventos
-          </Link>
-          <Link
-            href="/#contact"
-            onClick={(e) => scrollToSection(e, "contact")}
-            className="transition-colors hover:text-primary text-muted-foreground"
-          >
-            Contato
-          </Link>
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={(e) => scrollToSection(e, item.sectionId)}
+              className="transition-colors hover:text-primary text-muted-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+          <ThemeToggle />
         </nav>
 
-        {/* <div className="flex items-center gap-2">
-           <Button asChild size="sm">
-             <Link href="/admin/login">Área Admin</Link>
-           </Button>
-        </div> */}
-
+        {/* Menu Mobile */}
+        <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle />
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Abrir menu de navegação">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <SheetHeader>
+                <SheetTitle className="text-left">LABRIOT</SheetTitle>
+              </SheetHeader>
+              <nav className="mt-6 flex flex-col gap-3">
+                {NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={(e) => scrollToSection(e, item.sectionId)}
+                    className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
-  )
+  );
 }

@@ -1,79 +1,76 @@
 import { NextResponse } from 'next/server';
 import { openDb } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { SignJWT } from 'jose';
 import { cookies, headers } from 'next/headers';
-
-// Usa fallback em tempo de build para evitar quebrar o deploy do Vercel
-const JWT_SECRET = process.env.JWT_SECRET || 'temporary_development_secret_key_123456789';
-const SECRET = new TextEncoder().encode(JWT_SECRET);
-
-// Rate limiting simples em memória (5 tentativas / 15 min por IP)
-const MAX_ATTEMPTS = 5;
-const WINDOW_MS = 15 * 60 * 1000;
-const attempts = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const record = attempts.get(ip);
-
-  if (record && now < record.resetAt) {
-    if (record.count >= MAX_ATTEMPTS) {
-      return { allowed: false, remaining: 0 };
-    }
-    record.count++;
-    return { allowed: true, remaining: MAX_ATTEMPTS - record.count };
-  }
-
-  attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-  return { allowed: true, remaining: MAX_ATTEMPTS - 1 };
-}
+import { signAdminToken } from '@/lib/auth';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { loginSchema } from '@/lib/validation';
 
 export async function POST(request: Request) {
-  // Verifica rate limit pelo IP
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  const { allowed } = checkRateLimit(ip);
+  const ip = getClientIp(headersList);
+  const rate = checkRateLimit(ip, {
+    namespace: 'auth-login',
+    maxRequests: 5,
+    windowMs: 15 * 60 * 1000,
+  });
 
-  if (!allowed) {
-    return new Response('Muitas tentativas. Tente novamente em 15 minutos.', {
-      status: 429,
-    });
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Muitas tentativas. Tente novamente em 15 minutos.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rate.retryAfterSeconds) },
+      }
+    );
   }
 
   try {
-    const { username, password } = await request.json();
-    const db = await openDb();
+    const body = await request.json();
+    const parsed = loginSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Usuário e senha são obrigatórios.' },
+        { status: 400 }
+      );
+    }
 
-    const user = await db.get('SELECT * FROM users WHERE username = $1', [username]);
+    const { username, password } = parsed.data;
+    const db = await openDb();
+    const user = await db.get(
+      'SELECT id, username, password FROM users WHERE username = $1',
+      [username]
+    );
 
     if (!user) {
-      return new Response('Credenciais inválidas', { status: 401 });
+      return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
-      return new Response('Credenciais inválidas', { status: 401 });
+      return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 });
     }
 
-    // Gera token usando jose (mesma lib do middleware.ts)
-    const token = await new SignJWT({ userId: user.id, username: user.username })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('1h')
-      .sign(SECRET);
+    const token = await signAdminToken({
+      userId: Number(user.id),
+      username: user.username,
+    });
 
     const cookieStore = await cookies();
     cookieStore.set('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
-      maxAge: 60 * 60,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 2,
       path: '/',
     });
 
     return NextResponse.json({ message: 'Login bem-sucedido' });
   } catch (error) {
-    console.error(error);
-    return new Response('Ocorreu um erro ao fazer login.', { status: 500 });
+    console.error('[auth/login] Erro ao autenticar:', error);
+    return NextResponse.json(
+      { error: 'Ocorreu um erro ao fazer login.' },
+      { status: 500 }
+    );
   }
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useEffect, useState } from "react"
+import { sanitizeHref } from "@/lib/validation"
 
 export default function Projects() {
   const [projects, setProjects] = useState<any[]>([])
@@ -55,10 +56,10 @@ export default function Projects() {
                 </p>
               </CardContent>
               <CardFooter className="pt-0">
-                {project.url ? (
+                {sanitizeHref(project.url) ? (
                   <Button asChild className="w-full">
                     <Link 
-                      href={project.url} 
+                      href={sanitizeHref(project.url)!} 
                       target={project.url.startsWith("http") ? "_blank" : "_self"}
                       rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
                     >
@@ -99,10 +100,10 @@ export default function Projects() {
                 </p>
               </CardContent>
               <CardFooter className="pt-0">
-                {project.url ? (
+                {sanitizeHref(project.url) ? (
                   <Button asChild className="w-full">
                     <Link 
-                      href={project.url} 
+                      href={sanitizeHref(project.url)!} 
                       target={project.url.startsWith("http") ? "_blank" : "_self"}
                       rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
                     >

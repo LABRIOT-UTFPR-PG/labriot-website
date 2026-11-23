@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: labriot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-labriot}
+      POSTGRES_USER: ${POSTGRES_USER:-labriot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - labriot-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-labriot} -d ${POSTGRES_DB:-labriot}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://labriot.com.br}
+        NEXT_PUBLIC_ROBOFLOW_EMBED_URL: ${NEXT_PUBLIC_ROBOFLOW_EMBED_URL:-}
+    container_name: labriot-web
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      # Exposto apenas em localhost; o Nginx da VPS faz o proxy HTTPS na porta 443
+      - "127.0.0.1:3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-labriot}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-labriot}}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET com pelo menos 32 caracteres no .env}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+      CONTACT_TO_EMAIL: ${CONTACT_TO_EMAIL:-labriot.utfpr@gmail.com}
+      ROBOFLOW_API_KEY: ${ROBOFLOW_API_KEY:-}
+      ROBOFLOW_WORKFLOW_URL: ${ROBOFLOW_WORKFLOW_URL:-https://serverless.roboflow.com/image-jlx1n/workflows/detect-motherboard}
+      ROBOFLOW_RATE_LIMIT_PER_HOUR: ${ROBOFLOW_RATE_LIMIT_PER_HOUR:-15}
+      ROBOFLOW_DAILY_LIMIT: ${ROBOFLOW_DAILY_LIMIT:-250}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://labriot.com.br}
+    networks:
+      - labriot-internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata:
+
+networks:
+  labriot-internal:
+    driver: bridge

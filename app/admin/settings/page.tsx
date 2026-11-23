@@ -28,12 +28,12 @@ export default function SettingsPage() {
     enableNewsletter: true,
   })
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setSettings((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSocialMediaChange = (platform, value) => {
+  const handleSocialMediaChange = (platform: "twitter" | "linkedin" | "github", value: string) => {
     setSettings((prev) => ({
       ...prev,
       socialMedia: {
@@ -43,7 +43,7 @@ export default function SettingsPage() {
     }))
   }
 
-  const handleToggleChange = (name, checked) => {
+  const handleToggleChange = (name: string, checked: boolean) => {
     setSettings((prev) => ({ ...prev, [name]: checked }))
   }
 

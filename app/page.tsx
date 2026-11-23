@@ -1,4 +1,6 @@
 /* app/page.tsx */
+export const dynamic = "force-dynamic"
+
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, Brain, ChevronRight, Cpu } from "lucide-react"
@@ -72,7 +74,7 @@ export default function Home() {
             <Card>
               <CardHeader className="pb-2">
                 <Brain className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>Inteligência Artifical</CardTitle>
+                <CardTitle>Inteligência Artificial</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">

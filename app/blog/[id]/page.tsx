@@ -1,9 +1,11 @@
-"use client"
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+"use client";
+
+import { use, useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { sanitizeHref } from "@/lib/validation";
 
 interface Post {
   id: number;
@@ -14,54 +16,50 @@ interface Post {
   image?: string;
 }
 
-export default function PostPage({ params }: { params: { id: string } }) {
+export default function PostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
-  const { id } = params;
 
   useEffect(() => {
     if (id) {
       fetch(`/api/posts/${id}`)
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          }
-          throw new Error('Post not found');
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw new Error("Post not found");
         })
-        .then(data => {
-          setPost(data);
-        })
-        .catch(error => {
-          console.error("Failed to fetch post:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+        .then((data) => setPost(data))
+        .catch(() => setPost(null))
+        .finally(() => setLoading(false));
     }
   }, [id]);
 
   if (loading) {
     return (
-        <div className="container mx-auto px-4 py-12 text-center">
-            <p>Carregando post...</p>
-        </div>
+      <div className="container mx-auto px-4 py-12 text-center">
+        <p>Carregando post...</p>
+      </div>
     );
   }
 
   if (!post) {
-     return (
-        <div className="container mx-auto px-4 py-12 text-center">
-            <h1 className="text-2xl font-bold">Post não encontrado</h1>
-            <p className="text-muted-foreground mt-2">O post que você está procurando não existe ou foi movido.</p>
-            <Button asChild className="mt-6">
-                <Link href="/blog">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Voltar para o Blog
-                </Link>
-            </Button>
-        </div>
+    return (
+      <div className="container mx-auto px-4 py-12 text-center">
+        <h1 className="text-2xl font-bold">Post não encontrado</h1>
+        <p className="text-muted-foreground mt-2">
+          O post que você está procurando não existe ou foi movido.
+        </p>
+        <Button asChild className="mt-6">
+          <Link href="/blog">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar para o Blog
+          </Link>
+        </Button>
+      </div>
     );
   }
+
+  const safeImage = sanitizeHref(post.image);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -69,35 +67,33 @@ export default function PostPage({ params }: { params: { id: string } }) {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="mx-auto max-w-3xl">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    if (typeof window !== "undefined" && window.history.length > 1) {
-                      window.history.back();
-                    } else {
-                      window.location.href = "/blog";
-                    }
-                  }}
-                  className="mb-8 flex items-center gap-2"
-                >
+              <Button variant="outline" asChild className="mb-8">
+                <Link href="/blog" className="flex items-center gap-2">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Voltar para o Blog
-                </Button>
+                </Link>
+              </Button>
               <article>
                 <header className="mb-8 border-b pb-4">
                   <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{post.title}</h1>
                   <p className="mt-3 text-lg text-muted-foreground">
-                    Por {post.author} em {new Date(post.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    Por {post.author} em{" "}
+                    {new Date(
+                      /^\d{4}-\d{2}-\d{2}$/.test(post.date) ? `${post.date}T00:00:00` : post.date
+                    ).toLocaleDateString("pt-BR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </p>
                 </header>
-                {post.image && (
+                {safeImage && (
                   <div className="relative aspect-video w-full mb-8 overflow-hidden rounded-lg">
-                    <Image src={post.image} alt={post.title} layout="fill" objectFit="cover" />
+                    <Image src={safeImage} alt={post.title} fill className="object-cover" />
                   </div>
                 )}
-                {/* Usamos 'whitespace-pre-wrap' para renderizar as quebras de linha do banco de dados */}
                 <div className="prose prose-lg max-w-none text-lg leading-relaxed">
-                    <p style={{ whiteSpace: 'pre-wrap' }}>{post.content}</p>
+                  <p style={{ whiteSpace: "pre-wrap" }}>{post.content}</p>
                 </div>
               </article>
             </div>

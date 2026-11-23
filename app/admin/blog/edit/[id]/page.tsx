@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
-export default function EditPost({ params }: { params: { id: string } }) {
+export default function EditPost({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [postData, setPostData] = useState({
     title: '',
     summary: '',
@@ -21,7 +22,6 @@ export default function EditPost({ params }: { params: { id: string } }) {
     image: '',
   });
   const router = useRouter();
-  const { id } = params;
 
   useEffect(() => {
     if (id) {

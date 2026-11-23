@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 
-export default function EditProject({ params }: { params: { id: string } }) {
+export default function EditProject({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [projectData, setProjectData] = useState({
     title: '',
     status: '',
@@ -23,7 +24,6 @@ export default function EditProject({ params }: { params: { id: string } }) {
     url: '',
   });
   const router = useRouter();
-  const { id } = params;
 
   useEffect(() => {
     if (id) {

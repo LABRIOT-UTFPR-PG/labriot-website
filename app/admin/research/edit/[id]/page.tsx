@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,11 +11,11 @@ import Link from 'next/link';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
-export default function EditResearch({ params }: { params: { id: string } }) {
+export default function EditResearch({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const router = useRouter();
-  const { id } = params;
 
   useEffect(() => {
     if (id) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Save, Calendar as CalendarIcon, Clock, MapPin } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
-export default function EditEvent({ params }: { params: { id: string } }) {
+export default function EditEvent({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -21,7 +22,6 @@ export default function EditEvent({ params }: { params: { id: string } }) {
   });
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { id } = params;
 
   // Carregar dados do evento
   useEffect(() => {

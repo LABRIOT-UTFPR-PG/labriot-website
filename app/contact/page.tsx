@@ -1,19 +1,19 @@
-// app/contact/page.tsx
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Mail, MapPin, Phone } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { useState } from "react";
+import Link from "next/link";
+import { Mail, MapPin, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ContactPage() {
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,39 +21,43 @@ export default function ContactPage() {
     inquiryType: "",
     message: "",
     interest: "",
-  })
+    website: "", // Honeypot anti-bot
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleRadioChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, interest: value }))
-  }
+    setFormData((prev) => ({ ...prev, interest: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
+      const response = await fetch("/api/contact", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
+
+      const data = await response.json().catch(() => ({}));
 
       if (response.ok) {
         toast({
           title: "Formulário Enviado",
           description: "Obrigado por entrar em contato. Retornaremos em breve.",
         });
-        // Resetar formulário
         setFormData({
           name: "",
           email: "",
@@ -61,19 +65,25 @@ export default function ContactPage() {
           inquiryType: "",
           message: "",
           interest: "",
+          website: "",
         });
       } else {
-        throw new Error('Falha ao enviar o formulário.');
+        throw new Error(data.error || "Falha ao enviar o formulário.");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      const msg =
+        error instanceof Error
+          ? error.message
+          : "Ocorreu um erro ao enviar o formulário. Tente novamente mais tarde.";
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao enviar o formulário. Tente novamente mais tarde.",
+        description: msg,
         variant: "destructive",
       });
+    } finally {
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -114,7 +124,7 @@ export default function ContactPage() {
                       <div>
                         <h3 className="font-medium">Email</h3>
                         <p className="text-sm text-muted-foreground">
-                          <Link href="mailto:info@labriot.com" className="hover:underline">
+                          <Link href="mailto:labriot.utfpr@gmail.com" className="hover:underline">
                             labriot.utfpr@gmail.com
                           </Link>
                         </p>
@@ -130,6 +140,7 @@ export default function ContactPage() {
                     style={{ position: "absolute", border: 0 }}
                     allowFullScreen
                     loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
                     title="Localização do Labriot no mapa"
                     aria-label="Mapa mostrando a localização do Labriot"
                   ></iframe>
@@ -142,6 +153,18 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Campo honeypot invisível para bloquear bots */}
+                    <div className="hidden" aria-hidden="true">
+                      <Label htmlFor="website">Website</Label>
+                      <Input
+                        id="website"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={formData.website}
+                        onChange={handleChange}
+                      />
+                    </div>
                     <div className="space-y-2">
                       <Label htmlFor="name">Nome</Label>
                       <Input
@@ -150,6 +173,7 @@ export default function ContactPage() {
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="Seu nome"
+                        disabled={submitting}
                         required
                       />
                     </div>
@@ -162,6 +186,7 @@ export default function ContactPage() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="Seu email"
+                        disabled={submitting}
                         required
                       />
                     </div>
@@ -173,6 +198,7 @@ export default function ContactPage() {
                         value={formData.organization}
                         onChange={handleChange}
                         placeholder="Sua organização"
+                        disabled={submitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -180,6 +206,7 @@ export default function ContactPage() {
                       <Select
                         value={formData.inquiryType}
                         onValueChange={(value) => handleSelectChange("inquiryType", value)}
+                        disabled={submitting}
                       >
                         <SelectTrigger id="inquiryType">
                           <SelectValue placeholder="Selecione o tipo de consulta" />
@@ -198,6 +225,7 @@ export default function ContactPage() {
                         value={formData.interest}
                         onValueChange={handleRadioChange}
                         className="flex flex-col space-y-1"
+                        disabled={submitting}
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="autonomous-systems" id="autonomous-systems" />
@@ -218,8 +246,8 @@ export default function ContactPage() {
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="autonomous-systems" id="autonomous-systems" />
-                          <Label htmlFor="autonomous-systems" className="font-normal">
+                          <RadioGroupItem value="academic-inquiry" id="academic-inquiry" />
+                          <Label htmlFor="academic-inquiry" className="font-normal">
                             Consulta Acadêmica
                           </Label>
                         </div>
@@ -238,13 +266,22 @@ export default function ContactPage() {
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        placeholder="Sua mensagem"
+                        placeholder="Sua mensagem (mínimo 10 caracteres)"
+                        minLength={10}
                         required
+                        disabled={submitting}
                         className="min-h-[120px]"
                       />
                     </div>
-                    <Button type="submit" className="w-full">
-                      Enviar Mensagem
+                    <Button type="submit" className="w-full" disabled={submitting}>
+                      {submitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        "Enviar Mensagem"
+                      )}
                     </Button>
                   </form>
                 </CardContent>
@@ -269,8 +306,7 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Estamos abertos à colaborações com instituições acadêmicas e empresas de diversos ramos. Entre em contato conosco através do formulário acima, especificando seus interesses
-                    de pesquisa e potenciais áreas de colaboração.
+                    Estamos abertos a colaborações com instituições acadêmicas e empresas de diversos ramos. Entre em contato conosco através do formulário acima, especificando seus interesses de pesquisa e potenciais áreas de colaboração.
                   </p>
                 </CardContent>
               </Card>
@@ -280,8 +316,7 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Oferecemos visitas agendadas para parceiros acadêmicos e da indústria. Entre em contato conosco com
-                    pelo menos duas semanas de antecedência para agendar uma visita.
+                    Oferecemos visitas agendadas para parceiros acadêmicos e da indústria. Entre em contato conosco com pelo menos duas semanas de antecedência para agendar uma visita.
                   </p>
                 </CardContent>
               </Card>
@@ -290,5 +325,5 @@ export default function ContactPage() {
         </section>
       </main>
     </div>
-  )
+  );
 }

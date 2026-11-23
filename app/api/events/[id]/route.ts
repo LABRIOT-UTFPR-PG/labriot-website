@@ -1,35 +1,84 @@
 import { NextResponse } from 'next/server';
 import { openDb } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
+import { eventSchema, parseNumericId } from '@/lib/validation';
 
-// Buscar um evento específico para preencher o formulário de edição
-export async function GET(request: Request, context: { params: { id: string } }) {
-  const db = await openDb();
-  const event = await db.get('SELECT * FROM events WHERE id = $1', [context.params.id]);
-  
-  if (!event) {
-    return new Response('Evento não encontrado', { status: 404 });
+type RouteContext = { params: Promise<{ id: string }> };
+
+export async function GET(_request: Request, context: RouteContext) {
+  const { id: rawId } = await context.params;
+  const id = parseNumericId(rawId);
+  if (!id) {
+    return NextResponse.json({ error: 'ID inválido.' }, { status: 400 });
   }
-  
-  return NextResponse.json(event);
+
+  try {
+    const db = await openDb();
+    const event = await db.get('SELECT * FROM events WHERE id = $1', [id]);
+    if (!event) {
+      return NextResponse.json({ error: 'Evento não encontrado.' }, { status: 404 });
+    }
+    return NextResponse.json(event);
+  } catch (error) {
+    console.error('[api/events/[id]] Erro ao buscar evento:', error);
+    return NextResponse.json({ error: 'Erro ao carregar evento.' }, { status: 500 });
+  }
 }
 
-// Atualizar um evento (PUT)
-export async function PUT(request: Request, context: { params: { id: string } }) {
-  const db = await openDb();
-  const data = await request.json();
-  const { title, description, date, time, location } = data;
+export async function PUT(request: Request, context: RouteContext) {
+  const auth = await requireAdmin();
+  if (auth.response) return auth.response;
 
-  await db.run(
-    'UPDATE events SET title = $1, description = $2, date = $3, time = $4, location = $5 WHERE id = $6',
-    [title, description, date, time, location, context.params.id]
-  );
+  const { id: rawId } = await context.params;
+  const id = parseNumericId(rawId);
+  if (!id) {
+    return NextResponse.json({ error: 'ID inválido.' }, { status: 400 });
+  }
 
-  return NextResponse.json({ id: context.params.id, ...data });
+  try {
+    const body = await request.json();
+    const parsed = eventSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Dados inválidos.', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const { title, description, date, time, location } = parsed.data;
+    const db = await openDb();
+    const result = await db.run(
+      'UPDATE events SET title = $1, description = $2, date = $3, time = $4, location = $5 WHERE id = $6',
+      [title, description, date, time, location, id]
+    );
+
+    if (result.changes === 0) {
+      return NextResponse.json({ error: 'Evento não encontrado.' }, { status: 404 });
+    }
+
+    return NextResponse.json({ id, ...parsed.data });
+  } catch (error) {
+    console.error('[api/events/[id]] Erro ao atualizar evento:', error);
+    return NextResponse.json({ error: 'Erro ao atualizar evento.' }, { status: 500 });
+  }
 }
 
-// Deletar um evento (DELETE)
-export async function DELETE(request: Request, context: { params: { id: string } }) {
-  const db = await openDb();
-  await db.run('DELETE FROM events WHERE id = $1', [context.params.id]);
-  return new Response(null, { status: 204 });
+export async function DELETE(_request: Request, context: RouteContext) {
+  const auth = await requireAdmin();
+  if (auth.response) return auth.response;
+
+  const { id: rawId } = await context.params;
+  const id = parseNumericId(rawId);
+  if (!id) {
+    return NextResponse.json({ error: 'ID inválido.' }, { status: 400 });
+  }
+
+  try {
+    const db = await openDb();
+    await db.run('DELETE FROM events WHERE id = $1', [id]);
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    console.error('[api/events/[id]] Erro ao excluir evento:', error);
+    return NextResponse.json({ error: 'Erro ao excluir evento.' }, { status: 500 });
+  }
 }

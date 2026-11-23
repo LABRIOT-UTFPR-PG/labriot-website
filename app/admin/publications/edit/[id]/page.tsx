@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 
-export default function EditPublication({ params }: { params: { id: string } }) {
+export default function EditPublication({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [publication, setPublication] = useState({
     title: '',
     authors: '',
@@ -20,7 +21,6 @@ export default function EditPublication({ params }: { params: { id: string } }) 
     description: '',
   });
   const router = useRouter();
-  const { id } = params;
 
   useEffect(() => {
     if (id) {
